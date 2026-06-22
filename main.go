@@ -40,26 +40,50 @@ func createContainer(c *gin.Context) {
 }
 
 func main() {
+
+	// Config loading
 	config, err := util.LoadConfig(".")
 	if err != nil {
 		log.Fatal("cannot load from config: ", err)
 	}
 
+	// ProxMox Connection
 	client := proxmox.NewClient(config.PVEUrl,
 		proxmox.WithAPIToken(config.PVEUserRealm+"!"+config.PVETokenID, config.PVEToken),
-		//proxmox.WithInsecureSkipVerify(),    // lab only
 		//proxmox.WithTimeout(30*time.Second), // http.DefaultClient has no timeout
 	)
 
-	version, err := client.Version(context.Background())
+	// ProxMox Validation
+	ctx := context.Background()
+	version, err := client.Version(ctx)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(version.Release) // 6.3
 
-	router := gin.Default()
-	router.GET("/containers", getContainers)
-	router.POST("/containers", createContainer)
+	fmt.Println("teste")
 
+	node, err := client.Node(ctx, "blyanno")
+	fmt.Println(node.Name)
+	fmt.Println(node.Kversion)
+	fmt.Println(node.LoadAvg)
+	fmt.Println(node.CPU)
+	fmt.Println(node.RootFS)
+	fmt.Println(node.PVEVersion)
+	fmt.Println(node.CPUInfo)
+	fmt.Println(node.Swap)
+	fmt.Println(node.Idle)
+	fmt.Println(node.Memory)
+	fmt.Println(node.Ksm)
+	fmt.Println(node.Uptime)
+	fmt.Println(node.Wait)
+	fmt.Println(err)
+
+	// Router
+	/*
+		router := gin.Default()
+		router.GET("/containers", getContainers)
+		router.POST("/containers", createContainer)
+	*/
 	//router.Run("localhost:8090")
 }
