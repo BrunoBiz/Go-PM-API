@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"example/Go-PM-API/util"
-	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/luthermonson/go-proxmox"
@@ -24,19 +24,18 @@ var containers = []container{
 	{ID: 3, ProxMoxID: 103, Name: "Kanboard", Status: true},
 }
 
+var Node *proxmox.Node
+var Ctx context.Context
+var ctnList proxmox.Containers
+
 func getContainers(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, containers)
-}
 
-func createContainer(c *gin.Context) {
-	var newContainer container
-
-	if err := c.BindJSON(&newContainer); err != nil {
-		return
+	// Container list in main node
+	ctnList, err := Node.Containers(Ctx)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, nil)
 	}
-
-	containers = append(containers, newContainer)
-	c.IndentedJSON(http.StatusCreated, newContainer)
+	c.IndentedJSON(http.StatusOK, ctnList)
 }
 
 func main() {
@@ -50,40 +49,26 @@ func main() {
 	// ProxMox Connection
 	client := proxmox.NewClient(config.PVEUrl,
 		proxmox.WithAPIToken(config.PVEUserRealm+"!"+config.PVETokenID, config.PVEToken),
-		//proxmox.WithTimeout(30*time.Second), // http.DefaultClient has no timeout
+		proxmox.WithTimeout(30*time.Second), // http.DefaultClient has no timeout
 	)
 
+	// Creates context
+	Ctx = context.Background()
+
 	// ProxMox Validation
-	ctx := context.Background()
-	version, err := client.Version(ctx)
-	if err != nil {
-		panic(err)
+	_, err = client.Version(Ctx)
+	if err != nil || client == nil {
+		log.Fatal("cant connect to proxmox: ", err)
 	}
-	fmt.Println(version.Release) // 6.3
 
-	fmt.Println("teste")
-
-	node, err := client.Node(ctx, "blyanno")
-	fmt.Println(node.Name)
-	fmt.Println(node.Kversion)
-	fmt.Println(node.LoadAvg)
-	fmt.Println(node.CPU)
-	fmt.Println(node.RootFS)
-	fmt.Println(node.PVEVersion)
-	fmt.Println(node.CPUInfo)
-	fmt.Println(node.Swap)
-	fmt.Println(node.Idle)
-	fmt.Println(node.Memory)
-	fmt.Println(node.Ksm)
-	fmt.Println(node.Uptime)
-	fmt.Println(node.Wait)
-	fmt.Println(err)
+	// Main node - Loads only one
+	Node, err = client.Node(Ctx, config.PVENodeName)
+	if err != nil {
+		log.Fatal("cant retrieve main node: ", err)
+	}
 
 	// Router
-	/*
-		router := gin.Default()
-		router.GET("/containers", getContainers)
-		router.POST("/containers", createContainer)
-	*/
-	//router.Run("localhost:8090")
+	router := gin.Default()
+	router.GET("/containers", getContainers)
+	router.Run("localhost:8090")
 }

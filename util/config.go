@@ -4,12 +4,13 @@ import "github.com/spf13/viper"
 
 // Stores all configs - Reads with VIPER
 type Config struct {
-	PVEUrl       string `mapstructure:"PVE_URL"`
-	PVEUser      string `mapstructure:"PVE_USER"`
-	PVERealm     string `mapstructure:"PVE_REALM"`
-	PVEUserRealm string `mapstructure:"PVE_USER_REALM"`
-	PVETokenID   string `mapstructure:"PVE_TOKEN_ID"`
-	PVEToken     string `mapstructure:"PVE_TOKEN"`
+	PVEUrl       string `mapstructure:"PVE_URL"`        // Proxmox API URL
+	PVEUser      string `mapstructure:"PVE_USER"`       // Proxmox API User
+	PVERealm     string `mapstructure:"PVE_REALM"`      // Proxmox API Realm
+	PVEUserRealm string `mapstructure:"PVE_USER_REALM"` // PVEUser + "@" + PVERealm -> Ease of use | E.g. go-pm-api@pve or root@pam
+	PVETokenID   string `mapstructure:"PVE_TOKEN_ID"`   // "Name" of the token
+	PVEToken     string `mapstructure:"PVE_TOKEN"`      // Token itself -> Secret
+	PVENodeName  string `mapstructure:"PVE_NODE_NAME"`  // Main node - This API loads only one node and it's containers
 }
 
 func LoadConfig(path string) (config Config, err error) {
