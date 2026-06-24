@@ -3,8 +3,10 @@ package main
 import (
 	"context"
 	"example/Go-PM-API/util"
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -38,6 +40,42 @@ func getContainers(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, ctnList)
 }
 
+func getContainerById(c *gin.Context) {
+	var cntID uint64
+	cntID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+
+	// Container list in main node
+	ctnList, err := Node.Containers(Ctx)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, err)
+	}
+	// Looks for the container
+
+	for i := 0; i < len(ctnList); i++ {
+		if uint64(ctnList[i].VMID) == cntID {
+			c.IndentedJSON(http.StatusOK, ctnList[i])
+		}
+	}
+	c.IndentedJSON(http.StatusNotFound, nil)
+
+}
+
+func pingCtn() {
+	ctnList, _ := Node.Containers(Ctx)
+
+	for i := 0; i < len(ctnList); i++ {
+		ctn := ctnList[i]
+		ctnConfig := *ctn.ContainerConfig
+
+		fmt.Println(ctn.Name)
+		fmt.Println(ctnConfig.Hostname)
+		fmt.Println(ctnConfig.Nameserver)
+		fmt.Println(ctnConfig.Nets)
+		fmt.Println("--------------------------")
+	}
+
+}
+
 func main() {
 
 	// Config loading
@@ -67,8 +105,11 @@ func main() {
 		log.Fatal("cant retrieve main node: ", err)
 	}
 
+	pingCtn()
+
 	// Router
 	router := gin.Default()
 	router.GET("/containers", getContainers)
+	router.GET("/containers/:id", getContainerById)
 	router.Run("localhost:8090")
 }
