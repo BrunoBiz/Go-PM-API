@@ -29,6 +29,7 @@ var containers = []container{
 var Node *proxmox.Node
 var Ctx context.Context
 var ctnList proxmox.Containers
+var Client *proxmox.Client
 
 func getContainers(c *gin.Context) {
 
@@ -65,15 +66,16 @@ func pingCtn() {
 
 	for i := 0; i < len(ctnList); i++ {
 		ctn := ctnList[i]
-		ctnConfig := *ctn.ContainerConfig
 
 		fmt.Println(ctn.Name)
-		fmt.Println(ctnConfig.Hostname)
-		fmt.Println(ctnConfig.Nameserver)
-		fmt.Println(ctnConfig.Nets)
+		fmt.Println(Client.Get(Ctx, "/nodes/blyanno/lxc/101/config", &ctn.ContainerConfig))
 		fmt.Println("--------------------------")
-	}
 
+		fmt.Println(ctn.ContainerConfig.Hostname)
+		fmt.Println(ctn.ContainerConfig.Nameserver)
+		fmt.Println(ctn.ContainerConfig.Nets)
+
+	}
 }
 
 func main() {
@@ -85,7 +87,7 @@ func main() {
 	}
 
 	// ProxMox Connection
-	client := proxmox.NewClient(config.PVEUrl,
+	Client = proxmox.NewClient(config.PVEUrl,
 		proxmox.WithAPIToken(config.PVEUserRealm+"!"+config.PVETokenID, config.PVEToken),
 		proxmox.WithTimeout(30*time.Second), // http.DefaultClient has no timeout
 	)
@@ -94,13 +96,13 @@ func main() {
 	Ctx = context.Background()
 
 	// ProxMox Validation
-	_, err = client.Version(Ctx)
-	if err != nil || client == nil {
+	_, err = Client.Version(Ctx)
+	if err != nil || Client == nil {
 		log.Fatal("cant connect to proxmox: ", err)
 	}
 
 	// Main node - Loads only one
-	Node, err = client.Node(Ctx, config.PVENodeName)
+	Node, err = Client.Node(Ctx, config.PVENodeName)
 	if err != nil {
 		log.Fatal("cant retrieve main node: ", err)
 	}
@@ -108,8 +110,8 @@ func main() {
 	pingCtn()
 
 	// Router
-	router := gin.Default()
+	/*router := gin.Default()
 	router.GET("/containers", getContainers)
 	router.GET("/containers/:id", getContainerById)
-	router.Run("localhost:8090")
+	router.Run("localhost:8090")*/
 }
