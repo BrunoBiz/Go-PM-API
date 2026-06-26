@@ -63,19 +63,29 @@ func getContainerById(c *gin.Context) {
 
 func pingCtn() {
 	ctnList, _ := Node.Containers(Ctx)
+	var totalMem uint64
+	//ctnList[1].Ping()
 
 	for i := 0; i < len(ctnList); i++ {
 		ctn := ctnList[i]
 
 		fmt.Println(ctn.Name)
-		fmt.Println(Client.Get(Ctx, "/nodes/blyanno/lxc/101/config", &ctn.ContainerConfig))
+		fmt.Println(ctn.MaxMem / 1048576) // Memória máxima configurada para o container atual - Convertido para MB (de bytes)
+
+		if ctn.Status == "running" { // Caso esteja rodando o container - soma o valor total de memória
+			totalMem += ctn.MaxMem / 1048576
+		}
+
+		err := Client.Get(Ctx, fmt.Sprintf("/nodes/%s/lxc/%d/config", ctn.Node, ctn.VMID), &ctn.ContainerConfig)
+		if err == nil {
+			fmt.Println(ctn.ContainerConfig.Hostname)
+			fmt.Println(ctn.ContainerConfig.Nets)
+			fmt.Println(ctn.ContainerConfig.OnBoot)
+		}
 		fmt.Println("--------------------------")
-
-		fmt.Println(ctn.ContainerConfig.Hostname)
-		fmt.Println(ctn.ContainerConfig.Nameserver)
-		fmt.Println(ctn.ContainerConfig.Nets)
-
 	}
+
+	fmt.Printf("\nTotal Memory Used: %dMb | %dGb", totalMem, totalMem/1024)
 }
 
 func main() {
