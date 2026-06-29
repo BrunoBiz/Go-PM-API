@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"example/Go-PM-API/util"
 	"fmt"
@@ -9,9 +10,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/coder/websocket"
 	"github.com/gin-gonic/gin"
 	"github.com/luthermonson/go-proxmox"
+	"golang.org/x/crypto/ssh"
 )
 
 type container struct {
@@ -89,24 +90,42 @@ func pingCtn() {
 	fmt.Printf("\nTotal Memory Used: %dMb | %dGb", totalMem, totalMem/1024)
 }
 
-func testPost() {
-	//ctnList, _ := Node.Containers(Ctx)
-	c, _, err := websocket.Dial(Ctx, "wss://192.168.18.125:8006", nil)
+func testSSH() {
+	var hostKey ssh.PublicKey
 
-	if err != nil {
-		fmt.Println("err")
-		fmt.Println(err)
+	/*
+
+		FAZER FUNCIONAR O SSH COM PUBLIC KEY
+
+
+	*/
+
+	config := &ssh.ClientConfig{
+		User: "root",
+		Auth: []ssh.AuthMethod{
+			ssh.Password("Blyanno#1"),
+		},
+		HostKeyCallback: ssh.FixedHostKey(hostKey),
 	}
 
-	/*err = wsjson.Write(ctx, c, "hi")
+	client, err := ssh.Dial("tcp", "192.168.18.125:22", config)
 	if err != nil {
-		fmt.Println("Erro 1: " + err.Error())
-	}*/
-
-	if c != nil {
-		defer c.CloseNow()
-		c.Close(websocket.StatusNormalClosure, "")
+		log.Fatal("Failed to dial: ", err)
 	}
+	defer client.Close()
+
+	session, err := client.NewSession()
+	if err != nil {
+		log.Fatal("Failed to create session: ", err)
+	}
+	defer session.Close()
+
+	var b bytes.Buffer
+	session.Stdout = &b
+	if err := session.Run("/usr/bin/whoami"); err != nil {
+		log.Fatal("Failed to run: " + err.Error())
+	}
+	fmt.Println(b.String())
 }
 
 func main() {
@@ -139,7 +158,7 @@ func main() {
 	}
 
 	//pingCtn()
-	testPost()
+	testSSH()
 
 	// Router
 	/*router := gin.Default()
