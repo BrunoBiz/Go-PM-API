@@ -102,7 +102,7 @@ func testSSH(config util.Config) {
 		configSSH.AddHostKey(private)
 	*/
 
-\	var hostKey ssh.PublicKey
+	var hostKey ssh.PublicKey
 	configSSH := &ssh.ClientConfig{
 		User: "root",
 		Auth: []ssh.AuthMethod{
