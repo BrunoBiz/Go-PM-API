@@ -15,19 +15,6 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-type container struct {
-	ID        int    `json:"id"`
-	ProxMoxID int    `json:"proxmoxid"`
-	Name      string `json:"name"`
-	Status    bool   `json:"status"`
-}
-
-var containers = []container{
-	{ID: 1, ProxMoxID: 100, Name: "MBC-MineServer", Status: true},
-	{ID: 2, ProxMoxID: 101, Name: "UnturnedServer", Status: false},
-	{ID: 3, ProxMoxID: 103, Name: "Kanboard", Status: true},
-}
-
 var Node *proxmox.Node
 var Ctx context.Context
 var ctnList proxmox.Containers
@@ -90,17 +77,33 @@ func pingCtn() {
 	fmt.Printf("\nTotal Memory Used: %dMb | %dGb", totalMem, totalMem/1024)
 }
 
-func testSSH() {
-	var hostKey ssh.PublicKey
-
+func testSSH(config util.Config) {
 	/*
 
 		FAZER FUNCIONAR O SSH COM PUBLIC KEY
 
-
 	*/
 
-	config := &ssh.ClientConfig{
+	/*
+
+		SERVER -- https://gist.github.com/jpillora/b480fde82bff51a06238
+
+		privateBytes, err := os.ReadFile(config.SSHKeyFile)
+		if err != nil {
+			log.Fatal("Failed to load private key (./id_ed25519)")
+		}
+
+		private, err := ssh.ParsePrivateKeyWithPassphrase(privateBytes, []byte(config.SSHKeyPassphrase))
+		if err != nil {
+			log.Fatal("Failed to parse private key")
+		}
+
+		configSSH := &ssh.ServerConfig{}
+		configSSH.AddHostKey(private)
+	*/
+
+\	var hostKey ssh.PublicKey
+	configSSH := &ssh.ClientConfig{
 		User: "root",
 		Auth: []ssh.AuthMethod{
 			ssh.Password("Blyanno#1"),
@@ -108,7 +111,7 @@ func testSSH() {
 		HostKeyCallback: ssh.FixedHostKey(hostKey),
 	}
 
-	client, err := ssh.Dial("tcp", "192.168.18.125:22", config)
+	client, err := ssh.Dial("tcp", "192.168.18.125:22", configSSH)
 	if err != nil {
 		log.Fatal("Failed to dial: ", err)
 	}
@@ -158,7 +161,7 @@ func main() {
 	}
 
 	//pingCtn()
-	testSSH()
+	testSSH(config)
 
 	// Router
 	/*router := gin.Default()
