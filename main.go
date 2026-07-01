@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -53,7 +54,6 @@ func getContainerById(c *gin.Context) {
 func pingCtn() {
 	ctnList, _ := Node.Containers(Ctx)
 	var totalMem uint64
-	//ctnList[1].Ping()
 
 	for i := 0; i < len(ctnList); i++ {
 		ctn := ctnList[i]
@@ -78,37 +78,20 @@ func pingCtn() {
 }
 
 func testSSH(config util.Config) {
-	/*
+	privateBytes, err := os.ReadFile(config.SSHKeyFile)
+	if err != nil {
+		log.Fatal("Failed to load private key (./id_ed25519)")
+	}
 
-		FAZER FUNCIONAR O SSH COM PUBLIC KEY
+	signer, err := ssh.ParsePrivateKeyWithPassphrase(privateBytes, []byte(config.SSHKeyPassphrase))
+	if err != nil {
+		log.Fatal("Failed to parse private key")
+	}
 
-	*/
-
-	/*
-
-		SERVER -- https://gist.github.com/jpillora/b480fde82bff51a06238
-
-		privateBytes, err := os.ReadFile(config.SSHKeyFile)
-		if err != nil {
-			log.Fatal("Failed to load private key (./id_ed25519)")
-		}
-
-		private, err := ssh.ParsePrivateKeyWithPassphrase(privateBytes, []byte(config.SSHKeyPassphrase))
-		if err != nil {
-			log.Fatal("Failed to parse private key")
-		}
-
-		configSSH := &ssh.ServerConfig{}
-		configSSH.AddHostKey(private)
-	*/
-
-	var hostKey ssh.PublicKey
 	configSSH := &ssh.ClientConfig{
-		User: "root",
-		Auth: []ssh.AuthMethod{
-			ssh.Password("Blyanno#1"),
-		},
-		HostKeyCallback: ssh.FixedHostKey(hostKey),
+		User:            "root",
+		Auth:            []ssh.AuthMethod{ssh.PublicKeys(signer)},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // TODO - Change HostKeyCallback
 	}
 
 	client, err := ssh.Dial("tcp", "192.168.18.125:22", configSSH)
@@ -125,7 +108,8 @@ func testSSH(config util.Config) {
 
 	var b bytes.Buffer
 	session.Stdout = &b
-	if err := session.Run("/usr/bin/whoami"); err != nil {
+	//	if err := session.Run("/usr/bin/whoami"); err != nil {
+	if err := session.Run("lxc-attach -n 101 --uid 1001 /home/untserver/untserver details"); err != nil {
 		log.Fatal("Failed to run: " + err.Error())
 	}
 	fmt.Println(b.String())
