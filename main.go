@@ -3,56 +3,23 @@ package main
 import (
 	"bytes"
 	"context"
+	"example/Go-PM-API/api"
 	"example/Go-PM-API/util"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
-	"strconv"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/luthermonson/go-proxmox"
 	"golang.org/x/crypto/ssh"
 )
 
 var Node *proxmox.Node
-var Ctx context.Context
 var ctnList proxmox.Containers
 var Client *proxmox.Client
 
-func getContainers(c *gin.Context) {
-
-	// Container list in main node
-	ctnList, err := Node.Containers(Ctx)
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, nil)
-	}
-	c.IndentedJSON(http.StatusOK, ctnList)
-}
-
-func getContainerById(c *gin.Context) {
-	var cntID uint64
-	cntID, err := strconv.ParseUint(c.Param("id"), 10, 64)
-
-	// Container list in main node
-	ctnList, err := Node.Containers(Ctx)
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, err)
-	}
-	// Looks for the container
-
-	for i := 0; i < len(ctnList); i++ {
-		if uint64(ctnList[i].VMID) == cntID {
-			c.IndentedJSON(http.StatusOK, ctnList[i])
-		}
-	}
-	c.IndentedJSON(http.StatusNotFound, nil)
-
-}
-
-func pingCtn() {
-	ctnList, _ := Node.Containers(Ctx)
+func pingCtn(ctx context.Context) {
+	ctnList, _ := Node.Containers(ctx)
 	var totalMem uint64
 
 	for i := 0; i < len(ctnList); i++ {
@@ -65,7 +32,7 @@ func pingCtn() {
 			totalMem += ctn.MaxMem / 1048576
 		}
 
-		err := Client.Get(Ctx, fmt.Sprintf("/nodes/%s/lxc/%d/config", ctn.Node, ctn.VMID), &ctn.ContainerConfig)
+		err := Client.Get(ctx, fmt.Sprintf("/nodes/%s/lxc/%d/config", ctn.Node, ctn.VMID), &ctn.ContainerConfig)
 		if err == nil {
 			fmt.Println(ctn.ContainerConfig.Hostname)
 			fmt.Println(ctn.ContainerConfig.Nets)
@@ -94,7 +61,7 @@ func testSSH(config util.Config) {
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // TODO - Change HostKeyCallback
 	}
 
-	client, err := ssh.Dial("tcp", "192.168.18.125:22", configSSH)
+	client, err := ssh.Dial("tcp", "192.168.18.125:22", configSSH) // TODO - Set a new config for the IP
 	if err != nil {
 		log.Fatal("Failed to dial: ", err)
 	}
@@ -117,6 +84,9 @@ func testSSH(config util.Config) {
 
 func main() {
 
+	// Creates context
+	ctx := context.Background()
+
 	// Config loading
 	config, err := util.LoadConfig(".")
 	if err != nil {
@@ -129,27 +99,27 @@ func main() {
 		proxmox.WithTimeout(30*time.Second), // http.DefaultClient has no timeout
 	)
 
-	// Creates context
-	Ctx = context.Background()
-
 	// ProxMox Validation
-	_, err = Client.Version(Ctx)
+	_, err = Client.Version(ctx)
 	if err != nil || Client == nil {
 		log.Fatal("cant connect to proxmox: ", err)
 	}
 
 	// Main node - Loads only one
-	Node, err = Client.Node(Ctx, config.PVENodeName)
+	Node, err = Client.Node(ctx, config.PVENodeName)
 	if err != nil {
 		log.Fatal("cant retrieve main node: ", err)
 	}
 
-	//pingCtn()
-	testSSH(config)
+	server, err := api.NewServer(config, Client, ctx, Node)
+	println(server)
 
-	// Router
-	/*router := gin.Default()
-	router.GET("/containers", getContainers)
-	router.GET("/containers/:id", getContainerById)
-	router.Run("localhost:8090")*/
+	if err != nil {
+		log.Fatal("cannot create server")
+	}
+
+	server.Start("localhost:8090")
+	if err != nil {
+		log.Fatal("cannot start server", err)
+	}
 }
