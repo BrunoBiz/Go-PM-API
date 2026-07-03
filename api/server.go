@@ -2,26 +2,24 @@ package api
 
 import (
 	"context"
+	"example/Go-PM-API/proxmoxClient"
 	"example/Go-PM-API/util"
 
 	"github.com/gin-gonic/gin"
-	"github.com/luthermonson/go-proxmox"
 )
 
 type Server struct {
-	config util.Config
-	client *proxmox.Client
-	ctx    context.Context
-	node   *proxmox.Node
-	router *gin.Engine
+	config   util.Config
+	ctx      context.Context
+	router   *gin.Engine
+	pmClient *proxmoxClient.ProxmoxClient
 }
 
-func NewServer(config util.Config, client *proxmox.Client, ctx context.Context, node *proxmox.Node) (*Server, error) {
+func NewServer(config util.Config, ctx context.Context, proxmoxClient *proxmoxClient.ProxmoxClient) (*Server, error) {
 	server := &Server{
-		config: config,
-		client: client,
-		ctx:    ctx,
-		node:   node,
+		config:   config,
+		ctx:      ctx,
+		pmClient: proxmoxClient,
 	}
 
 	server.setupRouter()

@@ -9,7 +9,7 @@ import (
 
 func (server *Server) getContainers(c *gin.Context) {
 	// Container list in main node
-	ctnList, err := server.node.Containers(server.ctx)
+	ctnList, err := server.pmClient.Node.Containers(server.ctx)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, nil)
 	}
@@ -21,7 +21,7 @@ func (server *Server) getContainerById(c *gin.Context) {
 	cntID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 
 	// Container list in main node
-	ctnList, err := server.node.Containers(server.ctx)
+	ctnList, err := server.pmClient.Node.Containers(server.ctx)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
 	}
