@@ -13,6 +13,8 @@ type Config struct {
 	PVENodeName      string `mapstructure:"PVE_NODE_NAME"`      // Main node - This API loads only one node and it's containers
 	SSHKeyFile       string `mapstructure:"SSH_KEY_FILE"`       // SSH private key file path
 	SSHKeyPassphrase string `mapstructure:"SSH_KEY_PASSPHRASE"` // SSH key passphrase
+	SSHPveIP         string `mapstructure:"SSH_PVE_IP"`         // PVE IP for SSH Connection (Same IP address as PVE_URL)
+	SSHPvePort       string `mapstructure:"SSH_PVE_PORT"`       // PVE PORT for SSH Connection (Default 22)
 }
 
 func LoadConfig(path string) (config Config, err error) {

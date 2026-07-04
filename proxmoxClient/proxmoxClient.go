@@ -3,6 +3,7 @@ package proxmoxClient
 import (
 	"context"
 	"example/Go-PM-API/util"
+	"fmt"
 	"time"
 
 	"github.com/luthermonson/go-proxmox"
@@ -44,4 +45,31 @@ func NewClient(config util.Config, ctx context.Context) (*ProxmoxClient, error) 
 	}
 
 	return proxmoxClient, nil
+}
+
+// Testing
+func (pmClient *ProxmoxClient) PingCtn() {
+	ctnList, _ := pmClient.Node.Containers(pmClient.ctx)
+	var totalMem uint64
+
+	for i := 0; i < len(ctnList); i++ {
+		ctn := ctnList[i]
+
+		fmt.Println(ctn.Name)
+		fmt.Println(ctn.MaxMem / 1048576) // Memória máxima configurada para o container atual - Convertido para MB (de bytes)
+
+		if ctn.Status == "running" { // Caso esteja rodando o container - soma o valor total de memória
+			totalMem += ctn.MaxMem / 1048576
+		}
+
+		err := pmClient.Client.Get(pmClient.ctx, fmt.Sprintf("/nodes/%s/lxc/%d/config", ctn.Node, ctn.VMID), &ctn.ContainerConfig)
+		if err == nil {
+			fmt.Println(ctn.ContainerConfig.Hostname)
+			fmt.Println(ctn.ContainerConfig.Nets)
+			fmt.Println(ctn.ContainerConfig.OnBoot)
+		}
+		fmt.Println("--------------------------")
+	}
+
+	fmt.Printf("\nTotal Memory Used: %dMb | %dGb", totalMem, totalMem/1024)
 }
