@@ -32,6 +32,7 @@ func (server *Server) setupRouter() {
 
 	router.GET("/containers", server.getContainers)
 	router.GET("/containers/:id", server.getContainerById)
+	router.POST("/server/start", server.postStartServer)
 
 	server.router = router
 }
