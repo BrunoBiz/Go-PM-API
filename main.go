@@ -6,7 +6,6 @@ import (
 	"example/Go-PM-API/proxmoxClient"
 	"example/Go-PM-API/sshClient"
 	"example/Go-PM-API/util"
-	"fmt"
 	"log"
 )
 
@@ -31,11 +30,9 @@ func main() {
 	if err != nil {
 		log.Fatal("Could not establish ssh connection", err)
 	}
-	fmt.Println(sshClient) // TODO Placeholder
-	//sshClient.NewSession("lxc-attach -n 101 --uid 1001 /home/untserver/untserver details")
 
 	// API Server
-	server, err := api.NewServer(config, ctx, pmClient)
+	server, err := api.NewServer(config, ctx, pmClient, sshClient)
 	if err != nil {
 		log.Fatal("cannot create server")
 	}

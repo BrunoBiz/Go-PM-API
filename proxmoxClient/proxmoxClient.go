@@ -7,14 +7,12 @@ import (
 	"time"
 
 	"github.com/luthermonson/go-proxmox"
-	"golang.org/x/crypto/ssh"
 )
 
 type ProxmoxClient struct {
 	Client *proxmox.Client
 	Node   *proxmox.Node
 	config util.Config
-	ssh    *ssh.Client
 	ctx    context.Context
 }
 
