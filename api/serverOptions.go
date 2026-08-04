@@ -22,7 +22,9 @@ func (server *Server) postStartServer(c *gin.Context) {
 		return
 	}
 
-	teste, err := server.sshClient.NewSession("lxc-attach -n 106 --uid 0 /opt/gameserver stop")
+	//	teste, err := server.sshClient.NewSession("lxc-attach -n 106 --uid 0 /opt/gameserver details")
+	//	teste, err := server.sshClient.NewSession("pct exec 106 /opt/gameserver stop")
+	teste, err := server.sshClient.NewSession("pct exec 101 -- bash -c ''")
 
 	if err != nil {
 		slog.Error(err.Error())
@@ -31,7 +33,4 @@ func (server *Server) postStartServer(c *gin.Context) {
 	slog.Info(req.Placeholder)
 	slog.Info(strconv.Itoa(req.UserId))
 	slog.Info(strconv.Itoa(req.LxcId))
-
-	// TODO - SSH HERE - LXC ATTACH -> START SERVER
-
 }
