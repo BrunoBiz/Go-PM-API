@@ -1,16 +1,16 @@
 package api
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 type serverOptRequest struct {
 	LxcId       int    `json:"lxcId" binding:"required"`
-	UserId      int    `json:"uid" binding:"required"`
+	User        string `json:"user" binding:"required"`
 	Placeholder string `json:"Placeholder" binding:"required"` // TODO
 }
 
@@ -22,15 +22,21 @@ func (server *Server) postStartServer(c *gin.Context) {
 		return
 	}
 
-	//	teste, err := server.sshClient.NewSession("lxc-attach -n 106 --uid 0 /opt/gameserver details")
-	//	teste, err := server.sshClient.NewSession("pct exec 106 /opt/gameserver stop")
-	teste, err := server.sshClient.NewSession("pct exec 101 -- bash -c ''")
+	commandStart := fmt.Sprintf(`pct exec %d -- bash -c "su -s /bin/bash %s -c 'cd ~ && %s start'"`,
+		req.LxcId,
+		req.User,
+		req.Placeholder)
+
+	slog.Info("Command: " + commandStart)
+
+	optStartReturn, err := server.sshClient.NewSession(commandStart)
 
 	if err != nil {
 		slog.Error(err.Error())
+		c.IndentedJSON(http.StatusInternalServerError, err)
+		return
 	}
-	slog.Info(teste)
-	slog.Info(req.Placeholder)
-	slog.Info(strconv.Itoa(req.UserId))
-	slog.Info(strconv.Itoa(req.LxcId))
+
+	slog.Info(optStartReturn)
+	c.IndentedJSON(http.StatusOK, nil)
 }

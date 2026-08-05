@@ -1,7 +1,6 @@
 package sshClient
 
 import (
-	"bytes"
 	"example/Go-PM-API/util"
 	"os"
 
@@ -58,17 +57,14 @@ func (ssh *SshClient) NewSession(context string) (string, error) {
 	}
 	defer session.Close()
 
-	var b bytes.Buffer
-	session.Stdout = &b
+	returnValue, err := session.CombinedOutput(context)
 
-	//"lxc-attach -n 101 --uid 1001 /home/untserver/untserver details"
-
-	if err := session.Run(context); err != nil {
+	if err != nil {
+		//slog.Error("Failed to run: " + err.Error())
 		return "", err
-		//log.Fatal("Failed to run: " + err.Error())
 	}
-
-	return b.String(), nil
+	//slog.Info(string(returnValue))
+	return string(returnValue), nil
 }
 
 func (ssh *SshClient) CloseConnection() {
