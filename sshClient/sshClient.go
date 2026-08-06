@@ -2,6 +2,7 @@ package sshClient
 
 import (
 	"example/Go-PM-API/util"
+	"log/slog"
 	"os"
 
 	"golang.org/x/crypto/ssh"
@@ -52,18 +53,18 @@ func NewSshClient(config util.Config) (*SshClient, error) {
 func (ssh *SshClient) NewSession(context string) (string, error) {
 	session, err := ssh.sshClient.NewSession()
 	if err != nil {
+		slog.Error("SSH - Failed to create session: " + err.Error())
 		return "", err
-		// log.Fatal("Failed to create session: ", err)
 	}
+
 	defer session.Close()
 
 	returnValue, err := session.CombinedOutput(context)
 
 	if err != nil {
-		//slog.Error("Failed to run: " + err.Error())
-		return "", err
+		return string(returnValue), err
 	}
-	//slog.Info(string(returnValue))
+
 	return string(returnValue), nil
 }
 
