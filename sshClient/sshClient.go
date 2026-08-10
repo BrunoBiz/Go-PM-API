@@ -18,14 +18,12 @@ func NewSshClient(config util.Config) (*SshClient, error) {
 	privateBytes, err := os.ReadFile(config.SSHKeyFile)
 	if err != nil {
 		return nil, err
-		// log.Fatal("Failed to load private key (./id_ed25519)")
 	}
 
 	// Creates signer
 	signer, err := ssh.ParsePrivateKeyWithPassphrase(privateBytes, []byte(config.SSHKeyPassphrase))
 	if err != nil {
 		return nil, err
-		// log.Fatal("Failed to parse private key")
 	}
 
 	// SSH client config
@@ -38,7 +36,6 @@ func NewSshClient(config util.Config) (*SshClient, error) {
 	client, err := ssh.Dial("tcp", config.SSHPveIP+":"+config.SSHPvePort, configSSH)
 	if err != nil {
 		return nil, err
-		//log.Fatal("Failed to dial: ", err)
 	}
 
 	sshClient := &SshClient{
