@@ -10,14 +10,14 @@ import (
 )
 
 func main() {
-	// Creates context
-	ctx := context.Background()
-
 	// Loads config
 	config, err := util.LoadConfig(".")
 	if err != nil {
 		log.Fatal("cannot load from config: ", err)
 	}
+
+	// Creates context
+	ctx := context.Background()
 
 	// Proxmox Client
 	pmClient, err := proxmoxClient.NewClient(config, ctx)

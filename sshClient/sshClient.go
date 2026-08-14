@@ -28,7 +28,7 @@ func NewSshClient(config util.Config) (*SshClient, error) {
 
 	// SSH client config
 	configSSH := &ssh.ClientConfig{
-		User:            "root",
+		User:            "root", // TODO - maybe change this at some point
 		Auth:            []ssh.AuthMethod{ssh.PublicKeys(signer)},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // TODO - Change HostKeyCallback
 	}
