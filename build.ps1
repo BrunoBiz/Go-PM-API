@@ -28,7 +28,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # CHMOD API
-ssh "root@$deployIP" "chmod +x /home/api/ProxmoxMgr_API;"
+ssh "api@$deployIP" "sudo chmod +x ProxmoxMgr_API;"
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "SSH Failed - CHMOD."
