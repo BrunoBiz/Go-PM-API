@@ -1,0 +1,15 @@
+@startuml c1
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+LAYOUT_WITH_LEGEND()
+
+title System Context diagram for Proxmox Orchestration System
+
+Person(serverAdm, "Proxmox Server Administrator", "A Proxmox server administrator who manages multiple containers and/or game servers.")
+System(proxmox_system, "Proxmox Orchestration System", "Provides server administrators with an API to monitor a Proxmox environment and manage game servers running within its containers.")
+
+System_Ext(mainframe, "Proxmox server", "A Proxmox server hosting multiple containers and game servers.")
+
+Rel(serverAdm, proxmox_system, "Uses")
+Rel(proxmox_system, mainframe, "Monitors and Manages")
+@enduml

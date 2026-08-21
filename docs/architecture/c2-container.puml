@@ -1,0 +1,24 @@
+@startuml c2
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+LAYOUT_WITH_LEGEND()
+
+title Container diagram for Proxmox Orchestration System
+
+Person(serverAdm, "Proxmox Server Administrator", "A Proxmox server administrator who manages multiple containers and/or game servers.")
+
+System_Boundary(c1, "Proxmox Orchestration") {
+    Container(web_app, "Web Application", "x", "Not Yet Implemented")
+    Container(go_pm_API, "API Application", "GoLang", "Provides Proxmox Orchestration functionality via API")
+    Container(gsm, "Game Server Manager", "GoLang", "Provides an abstraction layer for managing game servers running in Proxmox containers")
+}
+
+System_Ext(linux_gsm, "LinuxGSM", "Command-line tool for deployment and management of Linux dedicated game servers.")
+System_Ext(proxmox_server, "Proxmox server", "A Proxmox server hosting multiple containers and game servers.")
+
+Rel(serverAdm, web_app, "Uses", "HTTPS")
+Rel(web_app, go_pm_API, "Uses", "x")
+
+Rel_Neighbor(go_pm_API, proxmox_server, "Uses", "HTTPS")
+Rel(go_pm_API, gsm, "Uses", "ssh")
+Rel(go_pm_API, linux_gsm, "Uses", "ssh")
+@enduml

@@ -28,7 +28,7 @@ func main() {
 	// SSH Client
 	sshClient, err := sshClient.NewSshClient(config)
 	if err != nil {
-		log.Fatal("Could not establish ssh connection", err)
+		log.Fatal("Could not establish ssh connection ", err)
 	}
 
 	// API Server
