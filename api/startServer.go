@@ -18,12 +18,12 @@ type serverStartRequest struct {
 // The output log is formatted as a JSON, which is unmarshaled into this struct
 type serverStartOutput struct {
 	Option        string `json:"option" binding:"required"`
-	Message       string `json:"message" binding:"required"`
-	Success       bool   `json:"success" binding:"required"`
-	Status        bool   `json:"status" binding:"required"`
-	Error         string `json:"error" binding:"required"`
 	Command       string `json:"command" binding:"required"`
 	CommandResult string `json:"commandresult" binding:"required"`
+	Success       bool   `json:"success" binding:"required"`
+	Status        bool   `json:"status" binding:"required"`
+	Message       string `json:"message" binding:"required"`
+	ErrMsg        string `json:"errmsg" binding:"required"`
 }
 
 func (server *Server) postStartServer(c *gin.Context) {
@@ -54,14 +54,12 @@ func (server *Server) postStartServer(c *gin.Context) {
 	}
 
 	// Unmarshalls the JSON formatted log into the struct
-	err = json.Unmarshal([]byte(optStartReturn[25:]), &serverOutput)
+	err = json.Unmarshal([]byte(optStartReturn), &serverOutput)
 
 	if err != nil {
 		slog.Error("JSON Unmarshal - " + err.Error())
 		c.IndentedJSON(http.StatusInternalServerError, err)
 	}
-
-	fmt.Println(optStartReturn)
 
 	c.IndentedJSON(http.StatusOK, serverOutput.Message) // TODO - Write a proper return message - Check if already running or started and such -- Use returned message
 }
