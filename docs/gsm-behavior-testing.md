@@ -27,8 +27,7 @@ Below is a list of all the tests that will be performed to collect the data for 
 
 Whenever possible, this is the data that will be collected from each test:
 - Exit code
-- Stdout
-- Stderr
+- Stdout / Stderr
 - Server state after test
 - Wheter the command succeded
 
@@ -36,12 +35,420 @@ Whenever possible, this is the data that will be collected from each test:
 
 ### LinuxGSM <!-- omit from toc -->
 
+Initial Status: Off
+
+```
+- Successful: True
+- Server state after: On
+- Exit code: 0
+- Stdout / Stderr:
+
+Using LinuxGSM - Wrapper
+[ .... ] Starting untserver: grep: /etc/apt/sources.list: No such file or directory
+[ WARN ] Starting untserver: Configuration file missing!
+/home/untserver/serverfiles/Servers/untserver/Config.json
+[  OK  ] Starting untserver: LinuxGSM
+```
+
+Initial Status: On
+
+```
+- Successful: False
+- Server state after: On
+- Exit code: 2
+- Stdout / Stderr:
+
+Using LinuxGSM - Wrapper
+[ .... ] Starting untserver: grep: /etc/apt/sources.list: No such file or directory
+[ WARN ] Starting untserver: Configuration file missing!
+/home/untserver/serverfiles/Servers/untserver/Config.json
+[ SKIP ] Starting untserver: LinuxGSM is already running
+```
+
 ### GSM <!-- omit from toc -->
 
+Initial Status: Off
+
+```
+- Successful: True
+- Server state after: On 
+- Exit code: 0
+- Stdout / Stderr:
+
+{"Option":"start","Command":"/bin/tmux new -d -s mockServerTest '/opt/mockServerTest'","CommandResult":"","Success":true,"ServerOnline":false,"Message":"Server started successfully","ErrMsg":""}
+```
+
+Initial Status: On
+
+```
+- Successful: False
+- Server state after: On 
+- Exit code: 1
+- Stdout / Stderr:
+
+{"Option":"start","Command":"/bin/tmux new -d -s mockServerTest '/opt/mockServerTest'","CommandResult":"duplicate session: mockServerTest\n","Success":false,"ServerOnline":false,"Message":"Failed to start server","ErrMsg":"exit status 1"}
+```
 
 
 ## Stop
 
+### LinuxGSM <!-- omit from toc -->
+
+Initial Status: Off
+
+```
+- Successful: True
+- Server state after: Off 
+- Exit code: 0
+- Stdout / Stderr:
+
+Using LinuxGSM - Wrapper
+[ WARN ] Stopping untserver: Configuration file missing!
+/home/untserver/serverfiles/Servers/untserver/Config.json
+[ SKIP ] Stopping untserver: LinuxGSM is already stopped
+```
+
+Initial Status: On
+
+```
+- Successful: True
+- Server state after: Off
+- Exit code: 0
+- Stdout / Stderr:
+
+Using LinuxGSM - Wrapper
+[ WARN ] Stopping untserver: Configuration file missing!
+/home/untserver/serverfiles/Servers/untserver/Config.json
+[  OK  ] Stopping untserver: Graceful: CTRL+c: 4 ... OK
+```
+
+### GSM <!-- omit from toc -->
+
+Initial Status: Off
+
+```
+- Successful: False
+- Server state after: Off
+- Exit code: 1
+- Stdout / Stderr:
+
+{"Option":"stop","Command":"/bin/tmux send-keys -t mockServerTest shutdown ENTER","CommandResult":"no server running on /tmp/tmux-1000/default\n","Success":false,"ServerOnline":false,"Message":"shutdown - Script failed to run","ErrMsg":"exit status 1"}
+```
+
+Initial Status: On
+
+```
+- Successful: True
+- Server state after: Off 
+- Exit code: 0
+- Stdout / Stderr:
+
+{"Option":"stop","Command":"/bin/tmux send-keys -t mockServerTest shutdown ENTER","CommandResult":"","Success":true,"ServerOnline":false,"Message":"Server stopped","ErrMsg":""}
+```
+
 ## Restart
 
+### LinuxGSM <!-- omit from toc -->
+
+Initial Status: Off
+
+```
+- Successful: True
+- Server state after: On
+- Exit code: 0
+- Stdout / Stderr:
+
+Using LinuxGSM - Wrapper
+grep: /etc/apt/sources.list: No such file or directory
+[ WARN ] Restarting untserver: Configuration file missing!
+/home/untserver/serverfiles/Servers/untserver/Config.json
+[ WARN ] Stopping untserver: Configuration file missing!
+/home/untserver/serverfiles/Servers/untserver/Config.json
+[ SKIP ] Stopping untserver: LinuxGSM is already stopped
+[ .... ] Starting untserver: grep: /etc/apt/sources.list: No such file or directory
+[ WARN ] Starting untserver: Configuration file missing!
+/home/untserver/serverfiles/Servers/untserver/Config.json
+[  OK  ] Starting untserver: LinuxGSM
+```
+
+Initial Status: On
+
+```
+- Successful: True
+- Server state after: On
+- Exit code: 0
+- Stdout / Stderr:
+
+Using LinuxGSM - Wrapper
+grep: /etc/apt/sources.list: No such file or directory
+[ WARN ] Restarting untserver: Configuration file missing!
+/home/untserver/serverfiles/Servers/untserver/Config.json
+[ WARN ] Stopping untserver: Configuration file missing!
+/home/untserver/serverfiles/Servers/untserver/Config.json
+[  OK  ] Stopping untserver: Graceful: CTRL+c: 3 ... OK
+[ .... ] Starting untserver: grep: /etc/apt/sources.list: No such file or directory
+[ WARN ] Starting untserver: Configuration file missing!
+/home/untserver/serverfiles/Servers/untserver/Config.json
+[  OK  ] Starting untserver: LinuxGSM
+```
+
+### GSM <!-- omit from toc -->
+
+Initial Status: Off
+
+```
+- Successful: True
+- Server state after: On 
+- Exit code: 0
+- Stdout / Stderr:
+
+{"Option":"details","Command":"/bin/tmux ls","CommandResult":"no server running on /tmp/tmux-1000/default\n","Success":true,"ServerOnline":false,"Message":"No server running","ErrMsg":""}
+{"Option":"start","Command":"/bin/tmux new -d -s mockServerTest '/opt/mockServerTest'","CommandResult":"","Success":true,"ServerOnline":false,"Message":"Server started successfully","ErrMsg":""}
+```
+
+Initial Status: On
+
+```
+- Successful: True
+- Server state after: On 
+- Exit code: 0
+- Stdout / Stderr:
+
+{"Option":"details","Command":"/bin/tmux ls","CommandResult":"mockServerTest: 1 windows (created Mon Aug 24 00:57:34 2026)\n","Success":true,"ServerOnline":true,"Message":"Server running","ErrMsg":""}
+Time elapsed: 15s / 300s
+
+{"Option":"stop","Command":"/bin/tmux send-keys -t mockServerTest shutdown ENTER","CommandResult":"","Success":true,"ServerOnline":false,"Message":"Server stopped","ErrMsg":""}
+{"Option":"start","Command":"/bin/tmux new -d -s mockServerTest '/opt/mockServerTest'","CommandResult":"","Success":true,"ServerOnline":false,"Message":"Server started successfully","ErrMsg":""}
+```
+
 ## Details
+
+### LinuxGSM <!-- omit from toc -->
+
+Initial Status: Off
+
+```
+- Successful: True
+- Server state after: Off 
+- Exit code: 0
+- Stdout / Stderr:
+
+Using LinuxGSM - Wrapper
+grep: /etc/apt/sources.list: No such file or directory
+
+Distro Details
+==============================================================================================================================================================================================================================================================================================
+Date:         Sat Aug 22 22:40:49 UTC 2026
+Distro:       Debian GNU/Linux 13 (trixie)
+Arch:         x86_64
+Kernel:       6.17.13-1-pve
+Hostname:     UnturnedServer
+Environment:  lxc
+Uptime:       0d, 21h, 28m
+tmux:         3.5a
+glibc:        2.41
+
+Server Resource
+==============================================================================================================================================================================================================================================================================================
+CPU
+Model:      AMD Ryzen 5 7430U with Radeon Graphics
+Cores:      6
+Frequency:  4340.882MHz
+Avg Load:   0.53, 0.66, 0.60
+
+Memory
+Mem:       total  used   free   cached  available
+Physical:  4.0GB  55MB   4.0GB  496MB   4.0GB
+Swap:      4.0GB  4.8MB  4.0GB
+
+Storage
+Filesystem:  /dev/mapper/pve-vm--101--disk--0
+Total:       20G
+Used:        4.7G
+Available:   14G
+
+Network
+IP:           0.0.0.0
+Internet IP:  177.92.54.179
+
+Unturned Resource Usage
+==============================================================================================================================================================================================================================================================================================
+CPU Used:  0%
+Mem Used:  0%  0MB
+
+Storage
+Total:        3.0G
+Serverfiles:  2.8G
+
+Unturned Server Details
+==============================================================================================================================================================================================================================================================================================
+Server name:  LinuxGSM
+App ID:       1110390
+Server IP:    0.0.0.0:27015
+Internet IP:  177.92.54.179:27015
+Maxplayers:   20
+Default map:  PEI
+Game mode:    normal
+Status:       STOPPED
+Query Check:  https://ismygameserver.online/valve/177.92.54.179:27015
+
+untserver Script Details
+==============================================================================================================================================================================================================================================================================================
+Script name:       untserver
+LinuxGSM version:  v25.2.0
+glibc required:    2.15
+IFTTT alert:       off
+Update on start:   off
+User:              untserver
+Location:          /home/untserver
+Config file:       /home/untserver/serverfiles/Servers/untserver/Config.json (FILE MISSING)
+
+Backups
+==============================================================================================================================================================================================================================================================================================
+No Backups created
+
+Command-line Parameters
+==============================================================================================================================================================================================================================================================================================
+ ./Unturned_Headless.x86_64 -nographics -batchmode -bind 0.0.0.0 -port 27015 -maxplayers 20 -perspective first -mode normal -name LinuxGSM -map PEI -gslt  +InternetServer/untserver
+
+Ports
+==============================================================================================================================================================================================================================================================================================
+Change ports by editing the parameters in:
+/home/untserver/lgsm/config-lgsm/untserver
+
+Useful port diagnostic command:
+ss -tuplwn | grep Unturned_Headle
+
+DESCRIPTION  PORT   PROTOCOL  LISTEN
+Game         27015  udp       0
+Query        27015  udp       0
+Steam        27016  udp       0
+
+Status: STOPPED
+```
+
+Initial Status: On
+
+```
+- Successful: True
+- Server state after: On 
+- Exit code: 0
+- Stdout / Stderr:
+
+Using LinuxGSM - Wrapper
+grep: /etc/apt/sources.list: No such file or directory
+
+Distro Details
+==============================================================================================================================================================================================================================================================================================
+Date:         Sat Aug 22 22:17:13 UTC 2026
+Distro:       Debian GNU/Linux 13 (trixie)
+Arch:         x86_64
+Kernel:       6.17.13-1-pve
+Hostname:     UnturnedServer
+Environment:  lxc
+Uptime:       0d, 21h, 5m
+tmux:         3.5a
+glibc:        2.41
+
+Server Resource
+==============================================================================================================================================================================================================================================================================================
+CPU
+Model:      AMD Ryzen 5 7430U with Radeon Graphics
+Cores:      6
+Frequency:  3836.092MHz
+Avg Load:   0.85, 0.58, 0.38
+
+Memory
+Mem:       total  used   free   cached  available
+Physical:  4.0GB  3.4GB  651MB  496MB   651MB
+Swap:      4.0GB  4.8MB  4.0GB
+
+Storage
+Filesystem:  /dev/mapper/pve-vm--101--disk--0
+Total:       20G
+Used:        4.7G
+Available:   14G
+
+Network
+IP:           0.0.0.0
+Internet IP:  177.92.54.179
+
+Unturned Resource Usage
+==============================================================================================================================================================================================================================================================================================
+CPU Used:  77.4%
+Mem Used:  83.8%  3434MB
+
+Storage
+Total:        3.0G
+Serverfiles:  2.8G
+
+Unturned Server Details
+==============================================================================================================================================================================================================================================================================================
+Server name:  LinuxGSM
+App ID:       1110390
+Server IP:    0.0.0.0:27015
+Internet IP:  177.92.54.179:27015
+Maxplayers:   20
+Default map:  PEI
+Game mode:    normal
+Status:       STARTED
+Query Check:  https://ismygameserver.online/valve/177.92.54.179:27015
+
+untserver Script Details
+==============================================================================================================================================================================================================================================================================================
+Script name:       untserver
+LinuxGSM version:  v25.2.0
+glibc required:    2.15
+IFTTT alert:       off
+Update on start:   off
+User:              untserver
+Location:          /home/untserver
+Config file:       /home/untserver/serverfiles/Servers/untserver/Config.json (FILE MISSING)
+
+Backups
+==============================================================================================================================================================================================================================================================================================
+No Backups created
+
+Command-line Parameters
+==============================================================================================================================================================================================================================================================================================
+ ./Unturned_Headless.x86_64 -nographics -batchmode -bind 0.0.0.0 -port 27015 -maxplayers 20 -perspective first -mode normal -name LinuxGSM -map PEI -gslt  +InternetServer/untserver
+
+Ports
+==============================================================================================================================================================================================================================================================================================
+Change ports by editing the parameters in:
+/home/untserver/lgsm/config-lgsm/untserver
+
+Useful port diagnostic command:
+ss -tuplwn | grep Unturned_Headle
+
+DESCRIPTION  PORT   PROTOCOL  LISTEN
+Game         27015  udp       1
+Query        27015  udp       1
+Steam        27016  udp       1
+
+Status: STARTED
+```
+
+### GSM <!-- omit from toc -->
+
+Initial Status: Off
+
+```
+- Successful: True
+- Server state after: Off
+- Exit code: 0
+- Stdout / Stderr:
+
+{"Option":"details","Command":"/bin/tmux ls","CommandResult":"no server running on /tmp/tmux-1000/default\n","Success":true,"ServerOnline":false,"Message":"No server running","ErrMsg":""}
+```
+
+Initial Status: On
+
+```
+- Successful: True
+- Server state after: On 
+- Exit code: 0 
+- Stdout / Stderr:
+
+{"Option":"details","Command":"/bin/tmux ls","CommandResult":"mockServerTest: 1 windows (created Mon Aug 24 00:58:59 2026)\n","Success":true,"ServerOnline":true,"Message":"Server running","ErrMsg":""}
+```
