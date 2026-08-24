@@ -1,44 +1,230 @@
-- [Intro](#intro)
-  - [Start](#start)
-  - [Stop](#stop)
-  - [Restart](#restart)
-  - [Details](#details)
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Intro</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
 
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
 
-# Intro
-This document presents the outcomes of LinuxGSM and GSM, in response to each of the main options provided by the API, in a way to compare both and find common semantic meaning between them.
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
 
-The purpose of these tests if to streamline how the response in the API will be handled, while still being agnostic to which one of the managers is currently running the server.
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
 
-The data collected here will represent if a manager is idempotent, if a request will result in an error or not, and the server state before and after it's sent.
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
 
-Below is a list of all the tests that will be performed to collect the data for this document:
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
 
-| **Initial state** | **Operation** | **LinuxGSM**  | **GSM**       |
-|-------------------|---------------|---------------|---------------|
-| on                | start         | actual output | actual output |
-| off               | start         | actual output | actual output |
-| on                | stop          | actual output | actual output |
-| off               | stop          | actual output | actual output |
-| on                | restart       | actual output | actual output |
-| off               | restart       | actual output | actual output |
-| on                | details       | actual output | actual output |
-| off               | details       | actual output | actual output |
+.markdown-alert>:first-child {
+  margin-top: 0
+}
 
-Whenever possible, this is the data that will be collected from each test:
-- Exit code
-- Stdout / Stderr
-- Server state after test
-- Wheter the command succeded
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
 
-## Start
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
 
-### LinuxGSM <!-- omit from toc -->
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
 
-Initial Status: Off
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
 
-```
-- Successful: True
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <span id="markdown-mermaid" aria-hidden="true" data-config="{&quot;darkModeTheme&quot;:&quot;vscode&quot;,&quot;lightModeTheme&quot;:&quot;vscode&quot;,&quot;maxTextSize&quot;:50000,&quot;clickDrag&quot;:&quot;alt&quot;,&quot;showControls&quot;:&quot;onHoverOrFocus&quot;,&quot;resizable&quot;:true,&quot;maxHeight&quot;:&quot;&quot;}"></span>
+				<ul>
+<li><a href="#intro">Intro</a>
+<ul>
+<li><a href="#start">Start</a></li>
+<li><a href="#stop">Stop</a></li>
+<li><a href="#restart">Restart</a></li>
+<li><a href="#details">Details</a></li>
+</ul>
+</li>
+</ul>
+<h1 id="intro">Intro</h1>
+<p>This document presents the outcomes of LinuxGSM and GSM, in response to each of the main options provided by the API, in a way to compare both and find common semantic meaning between them.</p>
+<p>The purpose of these tests if to streamline how the response in the API will be handled, while still being agnostic to which one of the managers is currently running the server.</p>
+<p>The data collected here will represent if a manager is idempotent, if a request will result in an error or not, and the server state before and after it's sent.</p>
+<p>Below is a list of all the tests that will be performed to collect the data for this document:</p>
+<table>
+<thead>
+<tr>
+<th><strong>Initial state</strong></th>
+<th><strong>Operation</strong></th>
+<th><strong>LinuxGSM</strong></th>
+<th><strong>GSM</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>on</td>
+<td>start</td>
+<td>actual output</td>
+<td>actual output</td>
+</tr>
+<tr>
+<td>off</td>
+<td>start</td>
+<td>actual output</td>
+<td>actual output</td>
+</tr>
+<tr>
+<td>on</td>
+<td>stop</td>
+<td>actual output</td>
+<td>actual output</td>
+</tr>
+<tr>
+<td>off</td>
+<td>stop</td>
+<td>actual output</td>
+<td>actual output</td>
+</tr>
+<tr>
+<td>on</td>
+<td>restart</td>
+<td>actual output</td>
+<td>actual output</td>
+</tr>
+<tr>
+<td>off</td>
+<td>restart</td>
+<td>actual output</td>
+<td>actual output</td>
+</tr>
+<tr>
+<td>on</td>
+<td>details</td>
+<td>actual output</td>
+<td>actual output</td>
+</tr>
+<tr>
+<td>off</td>
+<td>details</td>
+<td>actual output</td>
+<td>actual output</td>
+</tr>
+</tbody>
+</table>
+<p>Whenever possible, this is the data that will be collected from each test:</p>
+<ul>
+<li>Exit code</li>
+<li>Stdout / Stderr</li>
+<li>Server state after test</li>
+<li>Wheter the command succeded</li>
+</ul>
+<h2 id="start">Start</h2>
+<h3 id="linuxgsm-">LinuxGSM <!-- omit from toc --></h3>
+<p>Initial Status: Off</p>
+<pre><code>- Successful: True
 - Server state after: On
 - Exit code: 0
 - Stdout / Stderr:
@@ -48,12 +234,9 @@ Using LinuxGSM - Wrapper
 [ WARN ] Starting untserver: Configuration file missing!
 /home/untserver/serverfiles/Servers/untserver/Config.json
 [  OK  ] Starting untserver: LinuxGSM
-```
-
-Initial Status: On
-
-```
-- Successful: False
+</code></pre>
+<p>Initial Status: On</p>
+<pre><code>- Successful: False
 - Server state after: On
 - Exit code: 2
 - Stdout / Stderr:
@@ -63,41 +246,28 @@ Using LinuxGSM - Wrapper
 [ WARN ] Starting untserver: Configuration file missing!
 /home/untserver/serverfiles/Servers/untserver/Config.json
 [ SKIP ] Starting untserver: LinuxGSM is already running
-```
-
-### GSM <!-- omit from toc -->
-
-Initial Status: Off
-
-```
-- Successful: True
+</code></pre>
+<h3 id="gsm-">GSM <!-- omit from toc --></h3>
+<p>Initial Status: Off</p>
+<pre><code>- Successful: True
 - Server state after: On 
 - Exit code: 0
 - Stdout / Stderr:
 
-{"Option":"start","Command":"/bin/tmux new -d -s mockServerTest '/opt/mockServerTest'","CommandResult":"","Success":true,"ServerOnline":false,"Message":"Server started successfully","ErrMsg":""}
-```
-
-Initial Status: On
-
-```
-- Successful: False
+{&quot;Option&quot;:&quot;start&quot;,&quot;Command&quot;:&quot;/bin/tmux new -d -s mockServerTest '/opt/mockServerTest'&quot;,&quot;CommandResult&quot;:&quot;&quot;,&quot;Success&quot;:true,&quot;ServerOnline&quot;:false,&quot;Message&quot;:&quot;Server started successfully&quot;,&quot;ErrMsg&quot;:&quot;&quot;}
+</code></pre>
+<p>Initial Status: On</p>
+<pre><code>- Successful: False
 - Server state after: On 
-- Exit code: 0
+- Exit code: 1
 - Stdout / Stderr:
 
-{"Option":"start","Command":"/bin/tmux new -d -s mockServerTest '/opt/mockServerTest'","CommandResult":"duplicate session: mockServerTest\n","Success":false,"ServerOnline":false,"Message":"Failed to start server","ErrMsg":"exit status 1"}
-```
-
-
-## Stop
-
-### LinuxGSM <!-- omit from toc -->
-
-Initial Status: Off
-
-```
-- Successful: True
+{&quot;Option&quot;:&quot;start&quot;,&quot;Command&quot;:&quot;/bin/tmux new -d -s mockServerTest '/opt/mockServerTest'&quot;,&quot;CommandResult&quot;:&quot;duplicate session: mockServerTest\n&quot;,&quot;Success&quot;:false,&quot;ServerOnline&quot;:false,&quot;Message&quot;:&quot;Failed to start server&quot;,&quot;ErrMsg&quot;:&quot;exit status 1&quot;}
+</code></pre>
+<h2 id="stop">Stop</h2>
+<h3 id="linuxgsm--1">LinuxGSM <!-- omit from toc --></h3>
+<p>Initial Status: Off</p>
+<pre><code>- Successful: True
 - Server state after: Off 
 - Exit code: 0
 - Stdout / Stderr:
@@ -106,12 +276,9 @@ Using LinuxGSM - Wrapper
 [ WARN ] Stopping untserver: Configuration file missing!
 /home/untserver/serverfiles/Servers/untserver/Config.json
 [ SKIP ] Stopping untserver: LinuxGSM is already stopped
-```
-
-Initial Status: On
-
-```
-- Successful: True
+</code></pre>
+<p>Initial Status: On</p>
+<pre><code>- Successful: True
 - Server state after: Off
 - Exit code: 0
 - Stdout / Stderr:
@@ -120,40 +287,28 @@ Using LinuxGSM - Wrapper
 [ WARN ] Stopping untserver: Configuration file missing!
 /home/untserver/serverfiles/Servers/untserver/Config.json
 [  OK  ] Stopping untserver: Graceful: CTRL+c: 4 ... OK
-```
-
-### GSM <!-- omit from toc -->
-
-Initial Status: Off
-
-```
-- Successful: False
+</code></pre>
+<h3 id="gsm--1">GSM <!-- omit from toc --></h3>
+<p>Initial Status: Off</p>
+<pre><code>- Successful: False
 - Server state after: Off
 - Exit code: 1
 - Stdout / Stderr:
 
-{"Option":"stop","Command":"/bin/tmux send-keys -t mockServerTest shutdown ENTER","CommandResult":"no server running on /tmp/tmux-1000/default\n","Success":false,"ServerOnline":false,"Message":"shutdown - Script failed to run","ErrMsg":"exit status 1"}
-```
-
-Initial Status: On
-
-```
-- Successful: True
+{&quot;Option&quot;:&quot;stop&quot;,&quot;Command&quot;:&quot;/bin/tmux send-keys -t mockServerTest shutdown ENTER&quot;,&quot;CommandResult&quot;:&quot;no server running on /tmp/tmux-1000/default\n&quot;,&quot;Success&quot;:false,&quot;ServerOnline&quot;:false,&quot;Message&quot;:&quot;shutdown - Script failed to run&quot;,&quot;ErrMsg&quot;:&quot;exit status 1&quot;}
+</code></pre>
+<p>Initial Status: On</p>
+<pre><code>- Successful: True
 - Server state after: Off 
 - Exit code: 0
 - Stdout / Stderr:
 
-{"Option":"stop","Command":"/bin/tmux send-keys -t mockServerTest shutdown ENTER","CommandResult":"","Success":true,"ServerOnline":false,"Message":"Server stopped","ErrMsg":""}
-```
-
-## Restart
-
-### LinuxGSM <!-- omit from toc -->
-
-Initial Status: Off
-
-```
-- Successful: True
+{&quot;Option&quot;:&quot;stop&quot;,&quot;Command&quot;:&quot;/bin/tmux send-keys -t mockServerTest shutdown ENTER&quot;,&quot;CommandResult&quot;:&quot;&quot;,&quot;Success&quot;:true,&quot;ServerOnline&quot;:false,&quot;Message&quot;:&quot;Server stopped&quot;,&quot;ErrMsg&quot;:&quot;&quot;}
+</code></pre>
+<h2 id="restart">Restart</h2>
+<h3 id="linuxgsm--2">LinuxGSM <!-- omit from toc --></h3>
+<p>Initial Status: Off</p>
+<pre><code>- Successful: True
 - Server state after: On
 - Exit code: 0
 - Stdout / Stderr:
@@ -169,12 +324,9 @@ grep: /etc/apt/sources.list: No such file or directory
 [ WARN ] Starting untserver: Configuration file missing!
 /home/untserver/serverfiles/Servers/untserver/Config.json
 [  OK  ] Starting untserver: LinuxGSM
-```
-
-Initial Status: On
-
-```
-- Successful: True
+</code></pre>
+<p>Initial Status: On</p>
+<pre><code>- Successful: True
 - Server state after: On
 - Exit code: 0
 - Stdout / Stderr:
@@ -190,45 +342,33 @@ grep: /etc/apt/sources.list: No such file or directory
 [ WARN ] Starting untserver: Configuration file missing!
 /home/untserver/serverfiles/Servers/untserver/Config.json
 [  OK  ] Starting untserver: LinuxGSM
-```
-
-### GSM <!-- omit from toc -->
-
-Initial Status: Off
-
-```
-- Successful: True
+</code></pre>
+<h3 id="gsm--2">GSM <!-- omit from toc --></h3>
+<p>Initial Status: Off</p>
+<pre><code>- Successful: True
 - Server state after: On 
 - Exit code: 0
 - Stdout / Stderr:
 
-{"Option":"details","Command":"/bin/tmux ls","CommandResult":"no server running on /tmp/tmux-1000/default\n","Success":true,"ServerOnline":false,"Message":"No server running","ErrMsg":""}
-{"Option":"start","Command":"/bin/tmux new -d -s mockServerTest '/opt/mockServerTest'","CommandResult":"","Success":true,"ServerOnline":false,"Message":"Server started successfully","ErrMsg":""}
-```
-
-Initial Status: On
-
-```
-- Successful: True
+{&quot;Option&quot;:&quot;details&quot;,&quot;Command&quot;:&quot;/bin/tmux ls&quot;,&quot;CommandResult&quot;:&quot;no server running on /tmp/tmux-1000/default\n&quot;,&quot;Success&quot;:true,&quot;ServerOnline&quot;:false,&quot;Message&quot;:&quot;No server running&quot;,&quot;ErrMsg&quot;:&quot;&quot;}
+{&quot;Option&quot;:&quot;start&quot;,&quot;Command&quot;:&quot;/bin/tmux new -d -s mockServerTest '/opt/mockServerTest'&quot;,&quot;CommandResult&quot;:&quot;&quot;,&quot;Success&quot;:true,&quot;ServerOnline&quot;:false,&quot;Message&quot;:&quot;Server started successfully&quot;,&quot;ErrMsg&quot;:&quot;&quot;}
+</code></pre>
+<p>Initial Status: On</p>
+<pre><code>- Successful: True
 - Server state after: On 
 - Exit code: 0
 - Stdout / Stderr:
 
-{"Option":"details","Command":"/bin/tmux ls","CommandResult":"mockServerTest: 1 windows (created Mon Aug 24 00:57:34 2026)\n","Success":true,"ServerOnline":true,"Message":"Server running","ErrMsg":""}
+{&quot;Option&quot;:&quot;details&quot;,&quot;Command&quot;:&quot;/bin/tmux ls&quot;,&quot;CommandResult&quot;:&quot;mockServerTest: 1 windows (created Mon Aug 24 00:57:34 2026)\n&quot;,&quot;Success&quot;:true,&quot;ServerOnline&quot;:true,&quot;Message&quot;:&quot;Server running&quot;,&quot;ErrMsg&quot;:&quot;&quot;}
 Time elapsed: 15s / 300s
 
-{"Option":"stop","Command":"/bin/tmux send-keys -t mockServerTest shutdown ENTER","CommandResult":"","Success":true,"ServerOnline":false,"Message":"Server stopped","ErrMsg":""}
-{"Option":"start","Command":"/bin/tmux new -d -s mockServerTest '/opt/mockServerTest'","CommandResult":"","Success":true,"ServerOnline":false,"Message":"Server started successfully","ErrMsg":""}
-```
-
-## Details
-
-### LinuxGSM <!-- omit from toc -->
-
-Initial Status: Off
-
-```
-- Successful: True
+{&quot;Option&quot;:&quot;stop&quot;,&quot;Command&quot;:&quot;/bin/tmux send-keys -t mockServerTest shutdown ENTER&quot;,&quot;CommandResult&quot;:&quot;&quot;,&quot;Success&quot;:true,&quot;ServerOnline&quot;:false,&quot;Message&quot;:&quot;Server stopped&quot;,&quot;ErrMsg&quot;:&quot;&quot;}
+{&quot;Option&quot;:&quot;start&quot;,&quot;Command&quot;:&quot;/bin/tmux new -d -s mockServerTest '/opt/mockServerTest'&quot;,&quot;CommandResult&quot;:&quot;&quot;,&quot;Success&quot;:true,&quot;ServerOnline&quot;:false,&quot;Message&quot;:&quot;Server started successfully&quot;,&quot;ErrMsg&quot;:&quot;&quot;}
+</code></pre>
+<h2 id="details">Details</h2>
+<h3 id="linuxgsm--3">LinuxGSM <!-- omit from toc --></h3>
+<p>Initial Status: Off</p>
+<pre><code>- Successful: True
 - Server state after: Off 
 - Exit code: 0
 - Stdout / Stderr:
@@ -325,12 +465,9 @@ Query        27015  udp       0
 Steam        27016  udp       0
 
 Status: STOPPED
-```
-
-Initial Status: On
-
-```
-- Successful: True
+</code></pre>
+<p>Initial Status: On</p>
+<pre><code>- Successful: True
 - Server state after: On 
 - Exit code: 0
 - Stdout / Stderr:
@@ -427,28 +564,26 @@ Query        27015  udp       1
 Steam        27016  udp       1
 
 Status: STARTED
-```
-
-### GSM <!-- omit from toc -->
-
-Initial Status: Off
-
-```
-- Successful: True
+</code></pre>
+<h3 id="gsm--3">GSM <!-- omit from toc --></h3>
+<p>Initial Status: Off</p>
+<pre><code>- Successful: True
 - Server state after: Off
 - Exit code: 0
 - Stdout / Stderr:
 
-{"Option":"details","Command":"/bin/tmux ls","CommandResult":"no server running on /tmp/tmux-1000/default\n","Success":true,"ServerOnline":false,"Message":"No server running","ErrMsg":""}
-```
-
-Initial Status: On
-
-```
-- Successful: True
+{&quot;Option&quot;:&quot;details&quot;,&quot;Command&quot;:&quot;/bin/tmux ls&quot;,&quot;CommandResult&quot;:&quot;no server running on /tmp/tmux-1000/default\n&quot;,&quot;Success&quot;:true,&quot;ServerOnline&quot;:false,&quot;Message&quot;:&quot;No server running&quot;,&quot;ErrMsg&quot;:&quot;&quot;}
+</code></pre>
+<p>Initial Status: On</p>
+<pre><code>- Successful: True
 - Server state after: On 
 - Exit code: 0 
 - Stdout / Stderr:
 
-{"Option":"details","Command":"/bin/tmux ls","CommandResult":"mockServerTest: 1 windows (created Mon Aug 24 00:58:59 2026)\n","Success":true,"ServerOnline":true,"Message":"Server running","ErrMsg":""}
-```
+{&quot;Option&quot;:&quot;details&quot;,&quot;Command&quot;:&quot;/bin/tmux ls&quot;,&quot;CommandResult&quot;:&quot;mockServerTest: 1 windows (created Mon Aug 24 00:58:59 2026)\n&quot;,&quot;Success&quot;:true,&quot;ServerOnline&quot;:true,&quot;Message&quot;:&quot;Server running&quot;,&quot;ErrMsg&quot;:&quot;&quot;}
+</code></pre>
+
+            
+            
+        </body>
+        </html>
