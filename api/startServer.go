@@ -21,7 +21,7 @@ type serverStartOutput struct {
 	Command       string `json:"command" binding:"required"`
 	CommandResult string `json:"commandresult" binding:"required"`
 	Success       bool   `json:"success" binding:"required"`
-	Status        bool   `json:"status" binding:"required"`
+	Status        bool   `json:"serveronline" binding:"required"`
 	Message       string `json:"message" binding:"required"`
 	ErrMsg        string `json:"errmsg" binding:"required"`
 }
