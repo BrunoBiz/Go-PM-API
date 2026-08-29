@@ -8,7 +8,7 @@
 # Intro
 This document presents the outcomes of LinuxGSM and GSM, in response to each of the main options provided by the API, in a way to compare both and find common semantic meaning between them.
 
-The purpose of these tests if to streamline how the response in the API will be handled, while still being agnostic to which one of the managers is currently running the server.
+The purpose of these tests if to streamline how the response in the API will be handled, while still being agnostic to which one of the managers is currently hosting the server.
 
 The data collected here will represent if a manager is idempotent, if a request will result in an error or not, and the server state before and after it's sent.
 
@@ -75,7 +75,9 @@ Initial Status: Off
 - Exit code: 0
 - Stdout / Stderr:
 
-{"Option":"start","Command":"/bin/tmux new -d -s mockServerTest '/opt/mockServerTest'","CommandResult":"","Success":true,"ServerOnline":false,"Message":"Server started successfully","ErrMsg":""}
+""="GSM - START - SUCCESS: true"
+""="GSM - START - COMMAND: /bin/tmux new -d -s mockServerTest '/opt/mockServerTest'"
+""="GSM - START - MESSAGE: Server started"
 ```
 
 Initial Status: On
@@ -86,7 +88,11 @@ Initial Status: On
 - Exit code: 0
 - Stdout / Stderr:
 
-{"Option":"start","Command":"/bin/tmux new -d -s mockServerTest '/opt/mockServerTest'","CommandResult":"duplicate session: mockServerTest\n","Success":false,"ServerOnline":false,"Message":"Failed to start server","ErrMsg":"exit status 1"}
+""="GSM - START - SUCCESS: false"
+""="GSM - START - ERROR: exit status 1"
+""="GSM - START - COMMAND: /bin/tmux new -d -s mockServerTest '/opt/mockServerTest'"
+""="GSM - START - COMMAND RESULT: duplicate session: mockServerTest\n"
+""="GSM - START - MESSAGE: Server is already running"
 ```
 
 
@@ -132,7 +138,12 @@ Initial Status: Off
 - Exit code: 1
 - Stdout / Stderr:
 
-{"Option":"stop","Command":"/bin/tmux send-keys -t mockServerTest shutdown ENTER","CommandResult":"no server running on /tmp/tmux-1000/default\n","Success":false,"ServerOnline":false,"Message":"shutdown - Script failed to run","ErrMsg":"exit status 1"}
+""="Stopping server..."
+""="GSM - STOP - SUCCESS: false"
+""="GSM - STOP - ERROR: exit status 1"
+""="GSM - STOP - COMMAND: /bin/tmux send-keys -t mockServerTest shutdown ENTER"
+""="GSM - STOP - COMMAND RESULT: no server running on /tmp/tmux-1000/default\n"
+""="GSM - STOP - MESSAGE: shutdown - Script failed to run"
 ```
 
 Initial Status: On
@@ -143,7 +154,12 @@ Initial Status: On
 - Exit code: 0
 - Stdout / Stderr:
 
-{"Option":"stop","Command":"/bin/tmux send-keys -t mockServerTest shutdown ENTER","CommandResult":"","Success":true,"ServerOnline":false,"Message":"Server stopped","ErrMsg":""}
+""="Stopping server..."
+Time elapsed: 15s / 300s
+
+""="GSM - STOP - SUCCESS: true"
+""="GSM - STOP - COMMAND: /bin/tmux send-keys -t mockServerTest shutdown ENTER"
+""="GSM - STOP - MESSAGE: Server stopped"
 ```
 
 ## Restart
@@ -202,8 +218,14 @@ Initial Status: Off
 - Exit code: 0
 - Stdout / Stderr:
 
-{"Option":"details","Command":"/bin/tmux ls","CommandResult":"no server running on /tmp/tmux-1000/default\n","Success":true,"ServerOnline":false,"Message":"No server running","ErrMsg":""}
-{"Option":"start","Command":"/bin/tmux new -d -s mockServerTest '/opt/mockServerTest'","CommandResult":"","Success":true,"ServerOnline":false,"Message":"Server started successfully","ErrMsg":""}
+""="GSM - DETAILS - SUCCESS: true"
+""="GSM - DETAILS - SERVER STATUS: false"
+""="GSM - DETAILS - COMMAND: /bin/tmux ls"
+""="GSM - DETAILS - COMMAND RESULT: no server running on /tmp/tmux-1000/default\n"
+""="GSM - DETAILS - MESSAGE: No server running"
+""="GSM - START - SUCCESS: true"
+""="GSM - START - COMMAND: /bin/tmux new -d -s mockServerTest '/opt/mockServerTest'"
+""="GSM - START - MESSAGE: Server started"
 ```
 
 Initial Status: On
@@ -214,11 +236,20 @@ Initial Status: On
 - Exit code: 0
 - Stdout / Stderr:
 
-{"Option":"details","Command":"/bin/tmux ls","CommandResult":"mockServerTest: 1 windows (created Mon Aug 24 00:57:34 2026)\n","Success":true,"ServerOnline":true,"Message":"Server running","ErrMsg":""}
+""="GSM - DETAILS - SUCCESS: true"
+""="GSM - DETAILS - SERVER STATUS: true"
+""="GSM - DETAILS - COMMAND: /bin/tmux ls"
+""="GSM - DETAILS - COMMAND RESULT: mockServerTest: 1 windows (created Sat Aug 29 02:30:06 2026)\n"
+""="GSM - DETAILS - MESSAGE: Server running"
+""="Stopping server..."
 Time elapsed: 15s / 300s
 
-{"Option":"stop","Command":"/bin/tmux send-keys -t mockServerTest shutdown ENTER","CommandResult":"","Success":true,"ServerOnline":false,"Message":"Server stopped","ErrMsg":""}
-{"Option":"start","Command":"/bin/tmux new -d -s mockServerTest '/opt/mockServerTest'","CommandResult":"","Success":true,"ServerOnline":false,"Message":"Server started successfully","ErrMsg":""}
+""="GSM - STOP - SUCCESS: true"
+""="GSM - STOP - COMMAND: /bin/tmux send-keys -t mockServerTest shutdown ENTER"
+""="GSM - STOP - MESSAGE: Server stopped"
+""="GSM - START - SUCCESS: true"
+""="GSM - START - COMMAND: /bin/tmux new -d -s mockServerTest '/opt/mockServerTest'"
+""="GSM - START - MESSAGE: Server started"
 ```
 
 ## Details
@@ -439,7 +470,11 @@ Initial Status: Off
 - Exit code: 0
 - Stdout / Stderr:
 
-{"Option":"details","Command":"/bin/tmux ls","CommandResult":"no server running on /tmp/tmux-1000/default\n","Success":true,"ServerOnline":false,"Message":"No server running","ErrMsg":""}
+""="GSM - DETAILS - SUCCESS: true"
+""="GSM - DETAILS - SERVER STATUS: false"
+""="GSM - DETAILS - COMMAND: /bin/tmux ls"
+""="GSM - DETAILS - COMMAND RESULT: no server running on /tmp/tmux-1000/default\n"
+""="GSM - DETAILS - MESSAGE: No server running"
 ```
 
 Initial Status: On
@@ -450,5 +485,9 @@ Initial Status: On
 - Exit code: 0 
 - Stdout / Stderr:
 
-{"Option":"details","Command":"/bin/tmux ls","CommandResult":"mockServerTest: 1 windows (created Mon Aug 24 00:58:59 2026)\n","Success":true,"ServerOnline":true,"Message":"Server running","ErrMsg":""}
+""="GSM - DETAILS - SUCCESS: true"
+""="GSM - DETAILS - SERVER STATUS: true"
+""="GSM - DETAILS - COMMAND: /bin/tmux ls"
+""="GSM - DETAILS - COMMAND RESULT: mockServerTest: 1 windows (created Sat Aug 29 02:30:38 2026)\n"
+""="GSM - DETAILS - MESSAGE: Server running"
 ```
