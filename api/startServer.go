@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -40,12 +41,22 @@ func (server *Server) postStartServer(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(optStartReturn)
+	//fmt.Println(optStartReturn)
 	c.IndentedJSON(http.StatusOK, nil)
 
 	// Started
+	if strings.Contains(optStartReturn, "[  OK  ] Starting") ||
+		strings.Contains(optStartReturn, "MESSAGE: Server started") {
+		c.IndentedJSON(http.StatusOK, "Server started successfully.")
+		return
+	}
 
 	// Already running
+	if strings.Contains(optStartReturn, "is already running") {
+		c.IndentedJSON(http.StatusConflict, "Server is already running.")
+		return
+	}
 
 	// Error
+	c.IndentedJSON(http.StatusInternalServerError, "An error occurred, the server could not be started.")
 }
