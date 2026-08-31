@@ -143,7 +143,7 @@ Initial Status: Off
 ""="GSM - STOP - ERROR: exit status 1"
 ""="GSM - STOP - COMMAND: /bin/tmux send-keys -t mockServerTest shutdown ENTER"
 ""="GSM - STOP - COMMAND RESULT: no server running on /tmp/tmux-1000/default\n"
-""="GSM - STOP - MESSAGE: shutdown - Script failed to run"
+""="GSM - STOP - MESSAGE: Server is already stopped"
 ```
 
 Initial Status: On

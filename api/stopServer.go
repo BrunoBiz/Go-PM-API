@@ -2,19 +2,16 @@ package api
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
-// API Request body
-type serverStopRequest struct {
-	User string `json:"user" binding:"required"`
-}
-
 func (server *Server) postStopServer(c *gin.Context) {
-	var req serverStartRequest
+	var req ServerRequest
 	var cntID uint64
 
 	// Parameter sent via URL
@@ -33,6 +30,25 @@ func (server *Server) postStopServer(c *gin.Context) {
 	// Sends the command via SSH, returns the combined output - stdout + stderr
 	optStartReturn, err := server.sshClient.NewSession(commandStop)
 
-	fmt.Println(optStartReturn)
-	fmt.Print(err)
+	if err != nil {
+		slog.Error("SSH New Session: " + err.Error())
+		c.IndentedJSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	// Server stopped
+	if strings.Contains(optStartReturn, "[  OK  ] Stopping") ||
+		strings.Contains(optStartReturn, "MESSAGE: Server stopped") {
+		c.IndentedJSON(http.StatusOK, "Server stopped successfully.")
+		return
+	}
+
+	// Server is already stopped
+	if strings.Contains(optStartReturn, "is already stopped") {
+		c.IndentedJSON(http.StatusConflict, "Server is already stopped.")
+		return
+	}
+
+	// Error
+	c.IndentedJSON(http.StatusInternalServerError, "An error occurred, the server could not be stopped.")
 }

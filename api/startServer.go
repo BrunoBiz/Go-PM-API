@@ -10,13 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// API Request body
-type serverStartRequest struct {
-	User string `json:"user" binding:"required"`
-}
-
 func (server *Server) postStartServer(c *gin.Context) {
-	var req serverStartRequest
+	var req ServerRequest
 	var cntID uint64
 
 	// Parameter sent via URL
@@ -41,7 +36,6 @@ func (server *Server) postStartServer(c *gin.Context) {
 		return
 	}
 
-	//fmt.Println(optStartReturn)
 	c.IndentedJSON(http.StatusOK, nil)
 
 	// Started

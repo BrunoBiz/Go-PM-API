@@ -9,6 +9,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// API Request body
+type ServerRequest struct {
+	User string `json:"user" binding:"required"`
+}
+
 type Server struct {
 	config    util.Config
 	ctx       context.Context
