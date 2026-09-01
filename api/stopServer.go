@@ -28,7 +28,7 @@ func (server *Server) postStopServer(c *gin.Context) {
 		req.User)
 
 	// Sends the command via SSH, returns the combined output - stdout + stderr
-	optStartReturn, err := server.sshClient.NewSession(commandStop)
+	optStopReturn, err := server.sshClient.NewSession(commandStop)
 
 	if err != nil {
 		slog.Error("SSH New Session: " + err.Error())
@@ -37,14 +37,14 @@ func (server *Server) postStopServer(c *gin.Context) {
 	}
 
 	// Server stopped
-	if strings.Contains(optStartReturn, "[  OK  ] Stopping") ||
-		strings.Contains(optStartReturn, "MESSAGE: Server stopped") {
+	if strings.Contains(optStopReturn, "[  OK  ] Stopping") ||
+		strings.Contains(optStopReturn, "MESSAGE: Server stopped") {
 		c.IndentedJSON(http.StatusOK, "Server stopped successfully.")
 		return
 	}
 
 	// Server is already stopped
-	if strings.Contains(optStartReturn, "is already stopped") {
+	if strings.Contains(optStopReturn, "is already stopped") {
 		c.IndentedJSON(http.StatusConflict, "Server is already stopped.")
 		return
 	}
