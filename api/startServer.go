@@ -36,8 +36,6 @@ func (server *Server) postStartServer(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, nil)
-
 	// Started
 	if strings.Contains(optStartReturn, "[  OK  ] Starting") ||
 		strings.Contains(optStartReturn, "MESSAGE: Server started") {
@@ -52,5 +50,5 @@ func (server *Server) postStartServer(c *gin.Context) {
 	}
 
 	// Error
-	c.IndentedJSON(http.StatusInternalServerError, "An error occurred, the server could not be started.")
+	c.IndentedJSON(http.StatusInternalServerError, "An error has occurred, the server could not be started.")
 }

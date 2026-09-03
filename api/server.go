@@ -38,13 +38,15 @@ func NewServer(config util.Config, ctx context.Context, proxmoxClient *proxmoxCl
 func (server *Server) setupRouter() {
 	router := gin.Default()
 
-	// Proxmox API related calls
+	// Uses the Proxmox API
 	router.GET("/containers", server.getContainers)        // Returns info about all containers
 	router.GET("/containers/:id", server.getContainerById) // Returns info about a specific container
 
-	// SSH calls
-	router.POST("/containers/:id/start", server.postStartServer) // Start server
-	router.POST("/containers/:id/stop", server.postStartServer)  // Stop server
+	// Uses SSH to connect to a container and run the commands
+	router.POST("/containers/:id/start", server.postStartServer)     // Start server
+	router.POST("/containers/:id/stop", server.postStopServer)       // Stop server
+	router.POST("/containers/:id/details", server.postDetailsServer) // Server status -> Online/Offline
+	router.POST("/containers/:id/restart", server.postRestartServer) // Restart server
 
 	server.router = router
 }

@@ -219,7 +219,7 @@ Initial Status: Off
 - Stdout / Stderr:
 
 ""="GSM - DETAILS - SUCCESS: true"
-""="GSM - DETAILS - SERVER STATUS: false"
+""="GSM - DETAILS - SERVER STATUS: STOPPED"
 ""="GSM - DETAILS - COMMAND: /bin/tmux ls"
 ""="GSM - DETAILS - COMMAND RESULT: no server running on /tmp/tmux-1000/default\n"
 ""="GSM - DETAILS - MESSAGE: No server running"
@@ -237,9 +237,9 @@ Initial Status: On
 - Stdout / Stderr:
 
 ""="GSM - DETAILS - SUCCESS: true"
-""="GSM - DETAILS - SERVER STATUS: true"
+""="GSM - DETAILS - SERVER STATUS: STARTED"
 ""="GSM - DETAILS - COMMAND: /bin/tmux ls"
-""="GSM - DETAILS - COMMAND RESULT: mockServerTest: 1 windows (created Sat Aug 29 02:30:06 2026)\n"
+""="GSM - DETAILS - COMMAND RESULT: mockServerTest: 1 windows (created Thu Sep  3 01:08:27 2026)\n"
 ""="GSM - DETAILS - MESSAGE: Server running"
 ""="Stopping server..."
 Time elapsed: 15s / 300s
@@ -471,7 +471,7 @@ Initial Status: Off
 - Stdout / Stderr:
 
 ""="GSM - DETAILS - SUCCESS: true"
-""="GSM - DETAILS - SERVER STATUS: false"
+""="GSM - DETAILS - SERVER STATUS: STOPPED"
 ""="GSM - DETAILS - COMMAND: /bin/tmux ls"
 ""="GSM - DETAILS - COMMAND RESULT: no server running on /tmp/tmux-1000/default\n"
 ""="GSM - DETAILS - MESSAGE: No server running"
@@ -486,8 +486,8 @@ Initial Status: On
 - Stdout / Stderr:
 
 ""="GSM - DETAILS - SUCCESS: true"
-""="GSM - DETAILS - SERVER STATUS: true"
+""="GSM - DETAILS - SERVER STATUS: STARTED"
 ""="GSM - DETAILS - COMMAND: /bin/tmux ls"
-""="GSM - DETAILS - COMMAND RESULT: mockServerTest: 1 windows (created Sat Aug 29 02:30:38 2026)\n"
+""="GSM - DETAILS - COMMAND RESULT: mockServerTest: 1 windows (created Thu Sep  3 01:09:03 2026)\n"
 ""="GSM - DETAILS - MESSAGE: Server running"
 ```

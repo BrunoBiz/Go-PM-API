@@ -50,5 +50,5 @@ func (server *Server) postStopServer(c *gin.Context) {
 	}
 
 	// Error
-	c.IndentedJSON(http.StatusInternalServerError, "An error occurred, the server could not be stopped.")
+	c.IndentedJSON(http.StatusInternalServerError, "An error has occurred, the server could not be stopped.")
 }

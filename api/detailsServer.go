@@ -36,10 +36,18 @@ func (server *Server) postDetailsServer(c *gin.Context) {
 		return
 	}
 
-	// Server Details
-	if strings.Contains(strings.ToUpper(optDetailsReturn), "STATUS:") {
+	// Server is ONLINE
+	if strings.Contains(strings.ToUpper(strings.ReplaceAll(optDetailsReturn, " ", "")), "STATUS:STARTED") {
+		c.IndentedJSON(http.StatusOK, "Server ONLINE")
+		return
+	}
 
+	// Server is OFFLINE
+	if strings.Contains(strings.ToUpper(strings.ReplaceAll(optDetailsReturn, " ", "")), "STATUS:STOPPED") {
+		c.IndentedJSON(http.StatusOK, "Server OFFLINE")
+		return
 	}
 
 	// Error
+	c.IndentedJSON(http.StatusInternalServerError, "An error has occurred, the server status could not be retrieved.")
 }
