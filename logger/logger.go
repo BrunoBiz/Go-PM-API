@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"example/Go-PM-API/util"
 	"fmt"
 	"log/slog"
 	"os"
@@ -9,7 +8,7 @@ import (
 	"time"
 )
 
-func LoadLogger(config util.Config) error {
+func LoadLogger() error {
 	//The 'Log' folder will always be in the root directory of GameServerManager
 	err := checkDirectory()
 	if err != nil {

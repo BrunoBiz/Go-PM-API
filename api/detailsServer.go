@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"regexp"
 	"strconv"
-	"strings"
 
+	"github.com/acarl005/stripansi"
 	"github.com/gin-gonic/gin"
 )
 
@@ -36,14 +37,14 @@ func (server *Server) postDetailsServer(c *gin.Context) {
 		return
 	}
 
-	// Server is ONLINE
-	if strings.Contains(strings.ToUpper(strings.ReplaceAll(optDetailsReturn, " ", "")), "STATUS:STARTED") {
+	// Server ONLINE
+	if regexp.MustCompile(`(?mi)(status:)\s+(started)`).MatchString(stripansi.Strip(optDetailsReturn)) {
 		c.IndentedJSON(http.StatusOK, "Server ONLINE")
 		return
 	}
 
-	// Server is OFFLINE
-	if strings.Contains(strings.ToUpper(strings.ReplaceAll(optDetailsReturn, " ", "")), "STATUS:STOPPED") {
+	// Server OFFLINE
+	if regexp.MustCompile(`(?mi)(status:)\s+(stopped)`).MatchString(stripansi.Strip(optDetailsReturn)) {
 		c.IndentedJSON(http.StatusOK, "Server OFFLINE")
 		return
 	}

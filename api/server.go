@@ -5,8 +5,10 @@ import (
 	"example/Go-PM-API/proxmoxClient"
 	"example/Go-PM-API/sshClient"
 	"example/Go-PM-API/util"
+	"log/slog"
 
 	"github.com/gin-gonic/gin"
+	sloggin "github.com/samber/slog-gin"
 )
 
 // API Request body
@@ -37,6 +39,10 @@ func NewServer(config util.Config, ctx context.Context, proxmoxClient *proxmoxCl
 
 func (server *Server) setupRouter() {
 	router := gin.Default()
+	defaultLogger := slog.Default()
+
+	// Sets up the slog middleware for GIN
+	router.Use(sloggin.New(defaultLogger))
 
 	// Uses the Proxmox API
 	router.GET("/containers", server.getContainers)        // Returns info about all containers
