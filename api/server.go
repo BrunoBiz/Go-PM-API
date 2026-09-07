@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"example/Go-PM-API/logger"
 	"example/Go-PM-API/proxmoxClient"
 	"example/Go-PM-API/sshClient"
 	"example/Go-PM-API/util"
@@ -41,8 +42,28 @@ func (server *Server) setupRouter() {
 	router := gin.Default()
 	defaultLogger := slog.Default()
 
+	configSlogGin := sloggin.Config{
+		DefaultLevel: logger.LevelGIN,
+		//ClientErrorLevel: slog.LevelWarn,
+		//ServerErrorLevel: slog.LevelError,
+
+		WithUserAgent:      false,
+		WithRequestID:      true,
+		WithRequestBody:    true,
+		WithRequestHeader:  true,
+		WithResponseBody:   true,
+		WithResponseHeader: true,
+		WithSpanID:         false,
+		WithTraceID:        false,
+		WithClientIP:       false,
+
+		WithCustomMessage: func(c *gin.Context) string {
+			return "GIN-Log"
+		},
+	}
+
 	// Sets up the slog middleware for GIN
-	router.Use(sloggin.New(defaultLogger))
+	router.Use(sloggin.NewWithConfig(defaultLogger, configSlogGin))
 
 	// Uses the Proxmox API
 	router.GET("/containers", server.getContainers)        // Returns info about all containers

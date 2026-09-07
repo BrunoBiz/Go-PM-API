@@ -8,7 +8,29 @@ import (
 	"time"
 )
 
+/*
+	Slog log levels
+
+	File   -> -3 and above
+	Stdout -> 0 and above
+
+	const (
+		LevelDebug Level = -4
+		LevelGIN   Level = -3 --> Custom - All GIN middleware SLOG
+		LevelFile  Level = -2 --> Custom - Any logs that need to be logged to the file, but not STDOUT
+		LevelInfo  Level = 0
+		LevelWarn  Level = 4
+		LevelError Level = 8
+	)
+*/
+
+const (
+	LevelGIN  = slog.Level(-3)
+	LevelFile = slog.Level(-2)
+)
+
 func LoadLogger() error {
+
 	//The 'Log' folder will always be in the root directory of GameServerManager
 	err := checkDirectory()
 	if err != nil {
@@ -44,9 +66,9 @@ func LoadLogger() error {
 		return a
 	}
 
-	multiHandler := slog.NewMultiHandler(slog.NewTextHandler(
-		logFile, &slog.HandlerOptions{AddSource: true}), // Logs to the log file, has added source
-		slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{ReplaceAttr: replaceWithoutTimeLevel}), // Logs to the stdout, does not print the current time and log level
+	multiHandler := slog.NewMultiHandler(
+		slog.NewTextHandler(logFile, &slog.HandlerOptions{AddSource: true, Level: LevelGIN}),                              // Logs to the log file, has added source
+		slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{ReplaceAttr: replaceWithoutTimeLevel, Level: slog.LevelInfo}), // Logs to the stdout, does not print the current time and log level
 	)
 	slog.SetDefault(slog.New(multiHandler))
 
