@@ -18,6 +18,11 @@ paths:
               schema:
                 $ref: '#/components/schema/Container'
         default:
+          description: Unexpected error
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
 components:
   schemas:
     Container:
@@ -43,18 +48,21 @@ components:
           type: int
           format: uint64
         MaxMem:
-          type: 
+          type: int
+          format: uint64 
         MaxSwap:
-          type: 
+          type: int
+          format: uint64
         Name:
-          type: 
+          type: string
         Node:
-          type: 
+          type: string
         Status:
-          type: 
+          type: string
         Tags:
-          type: 
+          type: string
         Uptime:
-          type: 
+          type: int
+          format: uint64
         VMID:
-          type: 
+          type: StringOrUint64
