@@ -1,4 +1,60 @@
 openapi: 3.2.0
 info:
   title: Proxmox Orchestration API
-  version: 1.0.0 
+  version: 1.0.0
+servers:
+  - url: http://192.168.18.162:8090
+    name: "Local Proxmox container IP"
+paths:
+  /containers:
+    get:
+      summary: List all containers
+      operationId: listContainers
+      responses:
+        '200':
+          description: An array of containers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schema/Container'
+        default:
+components:
+  schemas:
+    Container:
+      type: object
+      required:
+        - ContainerConfig
+        - CPUs
+        - MaxDisk
+        - MaxMem
+        - MaxSwap
+        - Name
+        - Node
+        - Status
+        - Tags
+        - Uptime
+        - VMID
+      properties:
+        ContainerConfig:
+          type: array
+        CPUs:
+          type: int
+        MaxDisk:
+          type: int
+          format: uint64
+        MaxMem:
+          type: 
+        MaxSwap:
+          type: 
+        Name:
+          type: 
+        Node:
+          type: 
+        Status:
+          type: 
+        Tags:
+          type: 
+        Uptime:
+          type: 
+        VMID:
+          type: 

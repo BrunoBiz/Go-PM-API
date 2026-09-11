@@ -12,7 +12,9 @@ func (server *Server) getContainers(c *gin.Context) {
 	ctnList, err := server.pmClient.Node.Containers(server.ctx)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, nil)
+		return
 	}
+
 	c.IndentedJSON(http.StatusOK, ctnList)
 }
 
@@ -32,6 +34,6 @@ func (server *Server) getContainerById(c *gin.Context) {
 			c.IndentedJSON(http.StatusOK, ctnList[i])
 		}
 	}
-	c.IndentedJSON(http.StatusNotFound, nil)
+	c.IndentedJSON(http.StatusOK, "No container found")
 
 }
