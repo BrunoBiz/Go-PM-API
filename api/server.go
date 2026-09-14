@@ -12,9 +12,21 @@ import (
 	sloggin "github.com/samber/slog-gin"
 )
 
-// API Request body
+// API Request Body
 type ServerRequest struct {
 	User string `json:"user" binding:"required"`
+}
+
+// API Error
+type ServerError struct {
+	Message string `json:"message" binding:"required"`
+	Code    string `json:"code" binding:"required"`
+}
+
+// API Response
+type ServerResponse struct {
+	Status  bool   `json:"status" binding:"required"`
+	Message string `json:"message" binding:"required"`
 }
 
 type Server struct {
@@ -66,8 +78,9 @@ func (server *Server) setupRouter() {
 	router.Use(sloggin.NewWithConfig(defaultLogger, configSlogGin))
 
 	// Uses the Proxmox API
-	router.GET("/containers", server.getContainers)        // Returns info about all containers
-	router.GET("/containers/:id", server.getContainerById) // Returns info about a specific container
+	router.GET("/containers", server.getContainers)                     // Returns info about all containers
+	router.GET("/containers/:id", server.getContainerById)              // Returns info about a specific container
+	router.GET("/containers/:id/status", server.getContainerStatusById) // Returns if a specific container is running
 
 	// Uses SSH to connect to a container and run the commands
 	router.POST("/containers/:id/start", server.postStartServer)     // Start server
