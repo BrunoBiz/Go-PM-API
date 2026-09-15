@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"example/Go-PM-API/logger"
 	"example/Go-PM-API/proxmoxClient"
 	"example/Go-PM-API/sshClient"
@@ -17,16 +18,12 @@ type ServerRequest struct {
 	User string `json:"user" binding:"required"`
 }
 
-// API Error
-type ServerError struct {
-	Message string `json:"message" binding:"required"`
-	Code    string `json:"code" binding:"required"`
-}
-
-// API Response
-type ServerResponse struct {
-	Status  bool   `json:"status" binding:"required"`
-	Message string `json:"message" binding:"required"`
+// API response body
+type serverResponse struct {
+	Successful bool   `json:"successful" binding:"required"` // If the request was successful or not - False when an error occurs
+	Status     bool   `json:"status" binding:"required"`     // If the request could achieve what was intended / If the request is based on a boolean response E.g. If the server is running - True / If the container was not found - False
+	Message    string `json:"message" binding:"required"`
+	ErrorCode  string `json:"errorcode" binding:"required"`
 }
 
 type Server struct {
@@ -83,14 +80,40 @@ func (server *Server) setupRouter() {
 	router.GET("/containers/:id/status", server.getContainerStatusById) // Returns if a specific container is running
 
 	// Uses SSH to connect to a container and run the commands
-	router.POST("/containers/:id/start", server.postStartServer)     // Start server
-	router.POST("/containers/:id/stop", server.postStopServer)       // Stop server
-	router.POST("/containers/:id/details", server.postDetailsServer) // Server status -> Online/Offline
-	router.POST("/containers/:id/restart", server.postRestartServer) // Restart server
+	router.POST("/containers/server/:id/start", server.postStartServer)     // Start server
+	router.POST("/containers/server/:id/stop", server.postStopServer)       // Stop server
+	router.POST("/containers/server/:id/details", server.postDetailsServer) // Server status -> Online/Offline
+	router.POST("/containers/server/:id/restart", server.postRestartServer) // Restart server
 
 	server.router = router
 }
 
 func (server *Server) Start(address string) error {
 	return server.router.Run(address)
+}
+
+func NewSuccessfulResponse(status bool, message string) string {
+	response := serverResponse{
+		Successful: true,
+		Status:     status,
+		Message:    message,
+		ErrorCode:  "", // Not used in a SUCCESSFUL response
+	}
+
+	marshaledResponse, _ := json.Marshal(response)
+
+	return string(marshaledResponse)
+}
+
+func NewErrorResponse(message string, errorCode string) string { // Will only be considered as an error status codes in the 5xx range
+	response := serverResponse{
+		Successful: false,
+		Status:     false, // Not used in an UNSUCCESSFUL response
+		Message:    message,
+		ErrorCode:  errorCode,
+	}
+
+	marshaledResponse, _ := json.Marshal(response)
+
+	return string(marshaledResponse)
 }

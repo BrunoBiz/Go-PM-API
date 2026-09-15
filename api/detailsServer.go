@@ -1,6 +1,7 @@
 package api
 
 import (
+	"example/Go-PM-API/logger"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -12,14 +13,18 @@ import (
 )
 
 func (server *Server) postDetailsServer(c *gin.Context) {
+	slog.Log(c.Request.Context(), logger.LevelFile, "[postDetailsServer] - API CALL")
+
 	var req ServerRequest
 	var cntID uint64
 
 	// Parameter sent via URL
 	cntID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	slog.Log(c.Request.Context(), logger.LevelFile, "[postDetailsServer] - cntID: "+strconv.FormatUint(cntID, 10))
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		slog.Log(c.Request.Context(), logger.LevelFile, "[postDetailsServer] - ERROR: "+err.Error())
+		c.IndentedJSON(http.StatusBadRequest, NewErrorResponse("Bad request.", "BAD_REQUEST"))
 		return
 	}
 
@@ -27,28 +32,32 @@ func (server *Server) postDetailsServer(c *gin.Context) {
 	commandDetails := fmt.Sprintf(`pct exec %d -- bash -c "su -s /bin/bash %s -c 'cd ~ && ./gameserver details'"`,
 		cntID,
 		req.User)
+	slog.Log(c.Request.Context(), logger.LevelFile, "[postDetailsServer] - commandDetails: "+commandDetails)
 
 	// Sends the command via SSH, returns the combined output - stdout + stderr
 	optDetailsReturn, err := server.sshClient.NewSession(commandDetails)
 
 	if err != nil {
-		slog.Error("SSH New Session: " + err.Error())
-		c.IndentedJSON(http.StatusInternalServerError, err)
+		slog.Error("[postDetailsServer] - SSH New Session: " + err.Error())
+		c.IndentedJSON(http.StatusInternalServerError, NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR"))
 		return
 	}
 
 	// Server ONLINE
 	if regexp.MustCompile(`(?mi)(status:)\s+(started)`).MatchString(stripansi.Strip(optDetailsReturn)) {
-		c.IndentedJSON(http.StatusOK, "Server ONLINE")
+		slog.Log(c.Request.Context(), logger.LevelFile, "[postDetailsServer] - Server running")
+		c.IndentedJSON(http.StatusOK, NewSuccessfulResponse(true, "Server running"))
 		return
 	}
 
 	// Server OFFLINE
 	if regexp.MustCompile(`(?mi)(status:)\s+(stopped)`).MatchString(stripansi.Strip(optDetailsReturn)) {
-		c.IndentedJSON(http.StatusOK, "Server OFFLINE")
+		slog.Log(c.Request.Context(), logger.LevelFile, "[postDetailsServer] - Server stopped")
+		c.IndentedJSON(http.StatusOK, NewSuccessfulResponse(true, "Server stopped"))
 		return
 	}
 
 	// Error
-	c.IndentedJSON(http.StatusInternalServerError, "An error has occurred, the server status could not be retrieved.")
+	c.IndentedJSON(http.StatusInternalServerError, NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR"))
+	slog.Log(c.Request.Context(), logger.LevelFile, "[postDetailsServer] - OK")
 }

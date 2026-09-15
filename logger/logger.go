@@ -11,8 +11,8 @@ import (
 /*
 	Slog log levels
 
-	File   -> -3 and above
-	Stdout -> 0 and above
+	File   -> Log levels -3 and above
+	Stdout -> Log levels 0 and above
 
 	const (
 		LevelDebug Level = -4
