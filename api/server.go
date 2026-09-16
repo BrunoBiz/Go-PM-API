@@ -102,6 +102,9 @@ func NewSuccessfulResponse(status bool, message string) string {
 
 	marshaledResponse, _ := json.Marshal(response)
 
+	//fmt.Println(response)
+	//fmt.Println(string(marshaledResponse))
+
 	return string(marshaledResponse)
 }
 
