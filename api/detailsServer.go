@@ -24,7 +24,7 @@ func (server *Server) postDetailsServer(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		slog.Log(c.Request.Context(), logger.LevelFile, "[postDetailsServer] - ERROR: "+err.Error())
-		c.IndentedJSON(http.StatusBadRequest, NewErrorResponse("Bad request.", "BAD_REQUEST"))
+		c.Data(http.StatusBadRequest, "application/json", NewErrorResponse("Bad request.", "BAD_REQUEST"))
 		return
 	}
 
@@ -39,25 +39,25 @@ func (server *Server) postDetailsServer(c *gin.Context) {
 
 	if err != nil {
 		slog.Error("[postDetailsServer] - SSH New Session: " + err.Error())
-		c.IndentedJSON(http.StatusInternalServerError, NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR"))
+		c.Data(http.StatusInternalServerError, "application/json", NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR"))
 		return
 	}
 
 	// Server ONLINE
 	if regexp.MustCompile(`(?mi)(status:)\s+(started)`).MatchString(stripansi.Strip(optDetailsReturn)) {
 		slog.Log(c.Request.Context(), logger.LevelFile, "[postDetailsServer] - Server running")
-		c.IndentedJSON(http.StatusOK, NewSuccessfulResponse(true, "Server running"))
+		c.Data(http.StatusOK, "application/json", NewSuccessfulResponse(true, "Server running"))
 		return
 	}
 
 	// Server OFFLINE
 	if regexp.MustCompile(`(?mi)(status:)\s+(stopped)`).MatchString(stripansi.Strip(optDetailsReturn)) {
 		slog.Log(c.Request.Context(), logger.LevelFile, "[postDetailsServer] - Server stopped")
-		c.IndentedJSON(http.StatusOK, NewSuccessfulResponse(true, "Server stopped"))
+		c.Data(http.StatusOK, "application/json", NewSuccessfulResponse(true, "Server stopped"))
 		return
 	}
 
 	// Error
-	c.IndentedJSON(http.StatusInternalServerError, NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR"))
+	c.Data(http.StatusInternalServerError, "application/json", NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR"))
 	slog.Log(c.Request.Context(), logger.LevelFile, "[postDetailsServer] - OK")
 }

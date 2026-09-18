@@ -92,7 +92,7 @@ func (server *Server) Start(address string) error {
 	return server.router.Run(address)
 }
 
-func NewSuccessfulResponse(status bool, message string) string {
+func NewSuccessfulResponse(status bool, message string) []byte {
 	response := serverResponse{
 		Successful: true,
 		Status:     status,
@@ -102,13 +102,10 @@ func NewSuccessfulResponse(status bool, message string) string {
 
 	marshaledResponse, _ := json.Marshal(response)
 
-	//fmt.Println(response)
-	//fmt.Println(string(marshaledResponse))
-
-	return string(marshaledResponse)
+	return marshaledResponse
 }
 
-func NewErrorResponse(message string, errorCode string) string { // Will only be considered as an error status codes in the 5xx range
+func NewErrorResponse(message string, errorCode string) []byte { // Will only be considered as an error status codes in the 5xx range
 	response := serverResponse{
 		Successful: false,
 		Status:     false, // Not used in an UNSUCCESSFUL response
@@ -118,5 +115,5 @@ func NewErrorResponse(message string, errorCode string) string { // Will only be
 
 	marshaledResponse, _ := json.Marshal(response)
 
-	return string(marshaledResponse)
+	return marshaledResponse
 }

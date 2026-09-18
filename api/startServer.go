@@ -22,7 +22,7 @@ func (server *Server) postStartServer(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		slog.Log(c.Request.Context(), logger.LevelFile, "[postStartServer] - ERROR: "+err.Error())
-		c.IndentedJSON(http.StatusBadRequest, NewErrorResponse("Bad request.", "BAD_REQUEST"))
+		c.Data(http.StatusBadRequest, "application/json", NewErrorResponse("Bad request.", "BAD_REQUEST"))
 		return
 	}
 
@@ -37,25 +37,25 @@ func (server *Server) postStartServer(c *gin.Context) {
 
 	if err != nil {
 		slog.Error("[postStartServer] - SSH New Session: " + err.Error())
-		c.IndentedJSON(http.StatusInternalServerError, NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR"))
+		c.Data(http.StatusInternalServerError, "application/json", NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR"))
 		return
 	}
 
 	// Started
 	if strings.Contains(optStartReturn, "[  OK  ] Starting") || strings.Contains(optStartReturn, "MESSAGE: Server started") {
 		slog.Log(c.Request.Context(), logger.LevelFile, "[postStartServer] - Server started successfully")
-		c.IndentedJSON(http.StatusOK, NewSuccessfulResponse(true, "Server started successfully."))
+		c.Data(http.StatusOK, "application/json", NewSuccessfulResponse(true, "Server started successfully."))
 		return
 	}
 
 	// Already running
 	if strings.Contains(optStartReturn, "is already running") {
 		slog.Log(c.Request.Context(), logger.LevelFile, "[postStartServer] - Server is already running")
-		c.IndentedJSON(http.StatusOK, NewSuccessfulResponse(false, "Server is already running."))
+		c.Data(http.StatusOK, "application/json", NewSuccessfulResponse(false, "Server is already running."))
 		return
 	}
 
 	// Error
-	c.IndentedJSON(http.StatusInternalServerError, NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR"))
+	c.Data(http.StatusInternalServerError, "application/json", NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR"))
 	slog.Log(c.Request.Context(), logger.LevelFile, "[postStartServer] - OK")
 }

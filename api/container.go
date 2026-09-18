@@ -18,8 +18,7 @@ func (server *Server) getContainers(c *gin.Context) {
 
 	if err != nil {
 		slog.Log(c.Request.Context(), logger.LevelFile, "[getContainers] - ERROR: "+err.Error())
-		requestErrorMsg := NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR")
-		c.IndentedJSON(http.StatusInternalServerError, requestErrorMsg)
+		c.Data(http.StatusInternalServerError, "application/json", NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR"))
 		return
 	}
 
@@ -42,7 +41,7 @@ func (server *Server) getContainerById(c *gin.Context) {
 
 	if err != nil {
 		slog.Log(c.Request.Context(), logger.LevelFile, "[getContainerById] - ERROR: "+err.Error())
-		c.IndentedJSON(http.StatusInternalServerError, NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR"))
+		c.Data(http.StatusInternalServerError, "application/json", NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR"))
 		return
 	}
 
@@ -56,7 +55,7 @@ func (server *Server) getContainerById(c *gin.Context) {
 		}
 	}
 
-	c.IndentedJSON(http.StatusOK, serverResponse)
+	c.Data(http.StatusOK, "application/json", serverResponse)
 	slog.Log(c.Request.Context(), logger.LevelFile, "[getContainerById] - OK")
 }
 
@@ -75,8 +74,7 @@ func (server *Server) getContainerStatusById(c *gin.Context) {
 
 	if err != nil {
 		slog.Log(c.Request.Context(), logger.LevelFile, "[getContainerStatusById] - ERROR: "+err.Error())
-		requestErrorMsg := NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR")
-		c.IndentedJSON(http.StatusInternalServerError, requestErrorMsg)
+		c.Data(http.StatusInternalServerError, "application/json", NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR"))
 		return
 	}
 
@@ -88,6 +86,6 @@ func (server *Server) getContainerStatusById(c *gin.Context) {
 		}
 	}
 
-	c.IndentedJSON(http.StatusOK, serverResponse)
+	c.Data(http.StatusOK, "application/json", serverResponse)
 	slog.Log(c.Request.Context(), logger.LevelFile, "[getContainerStatusById] - OK")
 }
