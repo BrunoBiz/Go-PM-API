@@ -8,8 +8,12 @@ import (
 	"example/Go-PM-API/sshClient"
 	"example/Go-PM-API/util"
 	"log/slog"
+	"net/http"
 
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/danielgtaylor/huma/v2/adapters/humagin"
 	"github.com/gin-gonic/gin"
+	"github.com/luthermonson/go-proxmox"
 	sloggin "github.com/samber/slog-gin"
 )
 
@@ -26,12 +30,34 @@ type serverResponse struct {
 	ErrorCode  string `json:"errorcode" binding:"required"`
 }
 
+// Container info from the proxmox package, formatted to be used with HUMA
+type ContainerInfo struct {
+	CPUs    int                    `json:"cpus"`
+	MaxDisk uint64                 `json:"maxdisk"`
+	MaxMem  uint64                 `json:"maxmem"`
+	MaxSwap uint64                 `json:"maxswap"`
+	Name    string                 `json:"name"`
+	Node    string                 `json:"node"`
+	Status  string                 `json:"status"`
+	Tags    string                 `json:"tags"`
+	Uptime  uint64                 `json:"uptime"`
+	VMID    proxmox.StringOrUint64 `json:"vmid"`
+}
+
+// An array of containers
+type ContainerOutput struct {
+	Body struct {
+		Containers []ContainerInfo
+	}
+}
+
 type Server struct {
 	config    util.Config
 	ctx       context.Context
 	router    *gin.Engine
 	pmClient  *proxmoxClient.ProxmoxClient
 	sshClient *sshClient.SshClient
+	humaAPI   huma.API
 }
 
 func NewServer(config util.Config, ctx context.Context, proxmoxClient *proxmoxClient.ProxmoxClient, sshClient *sshClient.SshClient) (*Server, error) {
@@ -74,22 +100,38 @@ func (server *Server) setupRouter() {
 	// Sets up the slog middleware for GIN
 	router.Use(sloggin.NewWithConfig(defaultLogger, configSlogGin))
 
+	// Sets up HUMA
+	humaApi := humagin.New(router, huma.DefaultConfig("Test-api", "1.0.0"))
+
+	// Sets up routing
+	huma.Register(humaApi, huma.Operation{
+		OperationID: "get-containers",
+		Method:      http.MethodGet,
+		Path:        "/containers",
+		Summary:     "Get a list of all containers",
+	}, server.getContainers)
+
 	// Uses the Proxmox API
-	router.GET("/containers", server.getContainers)                     // Returns info about all containers
-	router.GET("/containers/:id", server.getContainerById)              // Returns info about a specific container
-	router.GET("/containers/:id/status", server.getContainerStatusById) // Returns if a specific container is running
+	/*
+		router.GET("/containers", server.getContainers)                     // Returns info about all containers
+		router.GET("/containers/:id", server.getContainerById)              // Returns info about a specific container
+		router.GET("/containers/:id/status", server.getContainerStatusById) // Returns if a specific container is running
+	*/
 
 	// Uses SSH to connect to a container and run the commands
-	router.POST("/containers/server/:id/start", server.postStartServer)     // Start server
-	router.POST("/containers/server/:id/stop", server.postStopServer)       // Stop server
-	router.POST("/containers/server/:id/details", server.postDetailsServer) // Server status -> Online/Offline
-	router.POST("/containers/server/:id/restart", server.postRestartServer) // Restart server
-
+	/*
+		router.POST("/containers/server/:id/start", server.postStartServer)     // Start server
+		router.POST("/containers/server/:id/stop", server.postStopServer)       // Stop server
+		router.POST("/containers/server/:id/details", server.postDetailsServer) // Server status -> Online/Offline
+		router.POST("/containers/server/:id/restart", server.postRestartServer) // Restart server
+	*/
 	server.router = router
+	server.humaAPI = humaApi
 }
 
 func (server *Server) Start(address string) error {
-	return server.router.Run(address)
+	return http.ListenAndServe(address, server.router)
+	//return server.router.Run(address)
 }
 
 func NewSuccessfulResponse(status bool, message string) []byte {

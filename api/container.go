@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"example/Go-PM-API/logger"
 	"log/slog"
 	"net/http"
@@ -9,21 +10,45 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (server *Server) getContainers(c *gin.Context) {
-	slog.Log(c.Request.Context(), logger.LevelFile, "[getContainers] - API CALL")
+/*func (server *Server) Asd(ctx context.Context, input *struct{}) (*ContainerOutput, error) {
+	resp := &ContainerOutput{}
+	return resp, nil
+}*/
+
+func (server *Server) getContainers(c context.Context, input *struct{}) (*ContainerOutput, error) {
+	slog.Log(c, logger.LevelFile, "[getContainers] - API CALL")
+
+	var containerInfo ContainerInfo
+	var containerOutput ContainerOutput
 
 	// Container list in main node
 	ctnList, err := server.pmClient.Node.Containers(server.ctx)
-	slog.Log(c.Request.Context(), logger.LevelFile, "[getContainers] - ctnList: "+strconv.Itoa(len(ctnList)))
+	slog.Log(c, logger.LevelFile, "[getContainers] - ctnList: "+strconv.Itoa(len(ctnList)))
 
 	if err != nil {
-		slog.Log(c.Request.Context(), logger.LevelFile, "[getContainers] - ERROR: "+err.Error())
-		c.Data(http.StatusInternalServerError, "application/json", NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR"))
-		return
+		slog.Log(c, logger.LevelFile, "[getContainers] - ERROR: "+err.Error())
+		//c.Data(http.StatusInternalServerError, "application/json", NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR"))
+		return nil, err
 	}
 
-	c.IndentedJSON(http.StatusOK, ctnList)
-	slog.Log(c.Request.Context(), logger.LevelFile, "[getContainers] - OK")
+	for _, ctnRange := range ctnList {
+		containerInfo.CPUs = ctnRange.CPUs
+		containerInfo.MaxDisk = ctnRange.MaxDisk
+		containerInfo.MaxMem = ctnRange.MaxMem
+		containerInfo.MaxSwap = ctnRange.MaxSwap
+		containerInfo.Name = ctnRange.Name
+		containerInfo.Node = ctnRange.Node
+		containerInfo.Status = ctnRange.Status
+		containerInfo.Tags = ctnRange.Tags
+		containerInfo.Uptime = ctnRange.Uptime
+		containerInfo.VMID = ctnRange.VMID
+
+		containerOutput.Body.Containers = append(containerOutput.Body.Containers, containerInfo)
+	}
+
+	//c.IndentedJSON(http.StatusOK, ctnList)
+	slog.Log(c, logger.LevelFile, "[getContainers] - OK")
+	return &containerOutput, err
 }
 
 func (server *Server) getContainerById(c *gin.Context) {

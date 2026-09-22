@@ -60,7 +60,7 @@ func main() {
 
 	// API server start
 	slog.Info("[Starting API] - Starting API server...")
-	err = server.Start("0.0.0.0:8090")
+	err = server.Start(":8090")
 	if err != nil {
 		slog.Error("[Starting API] - Could not start server: " + err.Error())
 		return
