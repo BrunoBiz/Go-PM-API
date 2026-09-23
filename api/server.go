@@ -104,6 +104,7 @@ func (server *Server) setupRouter() {
 	humaApi := humagin.New(router, huma.DefaultConfig("Test-api", "1.0.0"))
 
 	// Sets up routing
+	// Uses the Proxmox API
 	huma.Register(humaApi, huma.Operation{
 		OperationID: "get-containers",
 		Method:      http.MethodGet,
@@ -111,7 +112,13 @@ func (server *Server) setupRouter() {
 		Summary:     "Get a list of all containers",
 	}, server.getContainers)
 
-	// Uses the Proxmox API
+	huma.Register(humaApi, huma.Operation{
+		OperationID: "get-containersById",
+		Method:      http.MethodGet,
+		Path:        "/containers/:id",
+		Summary:     "Get a contaiber by ID",
+	}, server.getContainerById)
+
 	/*
 		router.GET("/containers", server.getContainers)                     // Returns info about all containers
 		router.GET("/containers/:id", server.getContainerById)              // Returns info about a specific container
