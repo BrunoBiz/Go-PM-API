@@ -1,63 +1,58 @@
 package api
 
 import (
+	"context"
+	"errors"
 	"example/Go-PM-API/logger"
 	"fmt"
 	"log/slog"
-	"net/http"
 	"regexp"
 	"strconv"
 
 	"github.com/acarl005/stripansi"
-	"github.com/gin-gonic/gin"
 )
 
-func (server *Server) postDetailsServer(c *gin.Context) {
-	slog.Log(c.Request.Context(), logger.LevelFile, "[postDetailsServer] - API CALL")
+func (server *Server) postDetailsServer(c context.Context, input *ServerRequest) (*ServerResponse, error) {
+	slog.Log(c, logger.LevelFile, "[postDetailsServer] - API CALL")
 
-	var req ServerRequest
+	var serverResponse = NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR")
 	var cntID uint64
 
 	// Parameter sent via URL
-	cntID, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	slog.Log(c.Request.Context(), logger.LevelFile, "[postDetailsServer] - cntID: "+strconv.FormatUint(cntID, 10))
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		slog.Log(c.Request.Context(), logger.LevelFile, "[postDetailsServer] - ERROR: "+err.Error())
-		c.Data(http.StatusBadRequest, "application/json", NewErrorResponse("Bad request.", "BAD_REQUEST"))
-		return
-	}
+	cntID = input.CntID
+	slog.Log(c, logger.LevelFile, "[postStartServer] - cntID: "+strconv.FormatUint(cntID, 10))
+	slog.Log(c, logger.LevelFile, "[postStartServer] - User: "+input.Body.User)
 
 	// Prepares the command to check server details
 	commandDetails := fmt.Sprintf(`pct exec %d -- bash -c "su -s /bin/bash %s -c 'cd ~ && ./gameserver details'"`,
 		cntID,
-		req.User)
-	slog.Log(c.Request.Context(), logger.LevelFile, "[postDetailsServer] - commandDetails: "+commandDetails)
+		input.Body.User)
+	slog.Log(c, logger.LevelFile, "[postDetailsServer] - commandDetails: "+commandDetails)
 
 	// Sends the command via SSH, returns the combined output - stdout + stderr
 	optDetailsReturn, err := server.sshClient.NewSession(commandDetails)
 
 	if err != nil {
 		slog.Error("[postDetailsServer] - SSH New Session: " + err.Error())
-		c.Data(http.StatusInternalServerError, "application/json", NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR"))
-		return
+		serverResponse = NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR")
+		return &serverResponse, err
 	}
 
 	// Server ONLINE
 	if regexp.MustCompile(`(?mi)(status:)\s+(started)`).MatchString(stripansi.Strip(optDetailsReturn)) {
-		slog.Log(c.Request.Context(), logger.LevelFile, "[postDetailsServer] - Server running")
-		c.Data(http.StatusOK, "application/json", NewSuccessfulResponse(true, "Server running"))
-		return
+		slog.Log(c, logger.LevelFile, "[postDetailsServer] - Server running")
+		serverResponse = NewSuccessfulResponse(true, "Server running")
+		return &serverResponse, nil
 	}
 
 	// Server OFFLINE
 	if regexp.MustCompile(`(?mi)(status:)\s+(stopped)`).MatchString(stripansi.Strip(optDetailsReturn)) {
-		slog.Log(c.Request.Context(), logger.LevelFile, "[postDetailsServer] - Server stopped")
-		c.Data(http.StatusOK, "application/json", NewSuccessfulResponse(true, "Server stopped"))
-		return
+		slog.Log(c, logger.LevelFile, "[postDetailsServer] - Server stopped")
+		serverResponse = NewSuccessfulResponse(true, "Server stopped")
+		return &serverResponse, nil
 	}
 
-	// Error
-	c.Data(http.StatusInternalServerError, "application/json", NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR"))
-	slog.Log(c.Request.Context(), logger.LevelFile, "[postDetailsServer] - OK")
+	// Error - If can't check server details, returns an error
+	slog.Log(c, logger.LevelFile, "[postDetailsServer] - OK")
+	return &serverResponse, errors.New("Unable to check server details")
 }

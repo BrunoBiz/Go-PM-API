@@ -1,61 +1,56 @@
 package api
 
 import (
+	"context"
+	"errors"
 	"example/Go-PM-API/logger"
 	"fmt"
 	"log/slog"
-	"net/http"
 	"strconv"
 	"strings"
-
-	"github.com/gin-gonic/gin"
 )
 
-func (server *Server) postRestartServer(c *gin.Context) {
-	slog.Log(c.Request.Context(), logger.LevelFile, "[postRestartServer] - API CALL")
-	var req ServerRequest
+func (server *Server) postRestartServer(c context.Context, input *ServerRequest) (*ServerResponse, error) {
+	slog.Log(c, logger.LevelFile, "[postRestartServer] - API CALL")
+
 	var cntID uint64
+	var serverResponse = NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR")
 
 	// Parameter sent via URL
-	cntID, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	slog.Log(c.Request.Context(), logger.LevelFile, "[postRestartServer] - cntID: "+strconv.FormatUint(cntID, 10))
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		slog.Log(c.Request.Context(), logger.LevelFile, "[postRestartServer] - ERROR: "+err.Error())
-		c.Data(http.StatusBadRequest, "application/json", NewErrorResponse("Bad request.", "BAD_REQUEST"))
-		return
-	}
+	cntID = input.CntID
+	slog.Log(c, logger.LevelFile, "[postStartServer] - cntID: "+strconv.FormatUint(cntID, 10))
+	slog.Log(c, logger.LevelFile, "[postStartServer] - User: "+input.Body.User)
 
 	// Prepares the command to restart the server
 	commandRestart := fmt.Sprintf(`pct exec %d -- bash -c "su -s /bin/bash %s -c 'cd ~ && ./gameserver restart'"`,
 		cntID,
-		req.User)
-	slog.Log(c.Request.Context(), logger.LevelFile, "[postRestartServer] - commandDetails: "+commandRestart)
+		input.Body.User)
+	slog.Log(c, logger.LevelFile, "[postRestartServer] - commandDetails: "+commandRestart)
 
 	// Sends the command via SSH, returns the combined output - stdout + stderr
 	optRestartReturn, err := server.sshClient.NewSession(commandRestart)
 
 	if err != nil {
 		slog.Error("SSH New Session: " + err.Error())
-		c.Data(http.StatusInternalServerError, "application/json", NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR"))
-		return
+		serverResponse = NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR")
+		return &serverResponse, err
 	}
 
 	// Started
 	if strings.Contains(optRestartReturn, "[  OK  ] Starting") || strings.Contains(optRestartReturn, "MESSAGE: Server started") {
-		slog.Log(c.Request.Context(), logger.LevelFile, "[postRestartServer] - Server started successfully")
-		c.Data(http.StatusOK, "application/json", NewSuccessfulResponse(true, "Server started successfully."))
-		return
+		slog.Log(c, logger.LevelFile, "[postRestartServer] - Server started successfully")
+		serverResponse = NewSuccessfulResponse(true, "Server started successfully.")
+		return &serverResponse, nil
 	}
 
 	// Already running
 	if strings.Contains(optRestartReturn, "is already running") {
-		slog.Log(c.Request.Context(), logger.LevelFile, "[postRestartServer] - Server is already running")
-		c.Data(http.StatusConflict, "application/json", NewSuccessfulResponse(false, "Server is already running."))
-		return
+		slog.Log(c, logger.LevelFile, "[postRestartServer] - Server is already running")
+		serverResponse = NewSuccessfulResponse(false, "Server is already running.")
+		return &serverResponse, nil
 	}
 
-	// Error
-	c.Data(http.StatusInternalServerError, "application/json", NewErrorResponse("An error occurred while processing the request.", "INTERNAL_SERVER_ERROR"))
-	slog.Log(c.Request.Context(), logger.LevelFile, "[postRestartServer] - OK")
+	// Error - If can't restart server, returns an error
+	slog.Log(c, logger.LevelFile, "[postRestartServer] - OK")
+	return &serverResponse, errors.New("Unable to restart server")
 }
