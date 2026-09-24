@@ -95,6 +95,16 @@ Initial Status: On
 ""="GSM - START - MESSAGE: Server is already running"
 ```
 
+Error
+
+```
+- Stdout / Stderr:
+
+"GSM - START - SUCCESS: false"
+"GSM - START - ERROR: chdir /opt/minecraft/MBC-Server/: no such file or directory"
+"GSM - START - COMMAND: /bin/tmux new -d -s minecraft '/opt/minecraft/MBC-Server/ServerStart.sh'"
+"GSM - START - MESSAGE: Unable to start"
+```
 
 ## Stop
 
