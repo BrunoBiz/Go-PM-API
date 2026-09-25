@@ -22,10 +22,10 @@ type ServerRequest struct {
 // API response body
 type ServerResponse struct {
 	Body struct {
-		Successful bool   `json:"successful" binding:"required"` // If the request was successful or not - False when an error occurs
-		Status     bool   `json:"status" binding:"required"`     // If the request could achieve what was intended / If the request is based on a boolean response E.g. If the server is running - True / If the container was not found - False
+		Successful bool   `json:"successful" binding:"required" doc:"If the request was successful or not - False when an error occurs"`                                                                                                        // If the request was successful or not - False when an error occurs
+		Status     bool   `json:"status" binding:"required" doc:"If the request could achieve what was intended / If the request is based on a boolean response E.g. If the server is running - True / If the container was not found - False"` // If the request could achieve what was intended / If the request is based on a boolean response E.g. If the server is running - True / If the container was not found - False
 		Message    string `json:"message" binding:"required"`
-		ErrorCode  string `json:"errorcode" binding:"required"`
+		ErrorCode  string `json:"errorcode" binding:"required" doc:"Unused in a successful response"`
 	}
 }
 

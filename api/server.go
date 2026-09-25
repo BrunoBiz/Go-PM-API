@@ -56,7 +56,8 @@ func (server *Server) setupRouter() {
 	router.Use(sloggin.NewWithConfig(defaultLogger, configSlogGin))
 
 	// Sets up HUMA
-	humaApi := humagin.New(router, huma.DefaultConfig("Test-api", "1.0.0"))
+	humaApi := humagin.New(router, huma.DefaultConfig("Proxmox Orchestration API", "1.0.0"))
+	openApiSpecs(humaApi)
 
 	// Sets up routing
 	// Uses the Proxmox API
@@ -64,21 +65,24 @@ func (server *Server) setupRouter() {
 		OperationID: "get-containers",
 		Method:      http.MethodGet,
 		Path:        "/containers",
-		Summary:     "Returns info about all containers",
+		Summary:     "Retrieve all containers",
+		Description: "Lists all available containers and information about each of them, such as id, name, uptime, status, etc.",
 	}, server.getContainers)
 
 	huma.Register(humaApi, huma.Operation{ // Returns info about a specific container
 		OperationID: "get-containersById",
 		Method:      http.MethodGet,
 		Path:        "/containers/:id",
-		Summary:     "Returns info about a specific container",
+		Summary:     "Retrieve container via id",
+		Description: "Returns information about a specific container, if found, via it's vmid.",
 	}, server.getContainerById)
 
 	huma.Register(humaApi, huma.Operation{ // Returns if a specific container is running
 		OperationID: "get-containerStatusById",
 		Method:      http.MethodGet,
 		Path:        "/containers/:id/status",
-		Summary:     "Returns if a specific container is running",
+		Summary:     "Check if container is running",
+		Description: "Retrieves the current running state of the specified Proxmox LXC container.",
 	}, server.getContainerStatusById)
 
 	// Uses SSH to connect to a container and run the commands
@@ -86,28 +90,32 @@ func (server *Server) setupRouter() {
 		OperationID: "post-startServer",
 		Method:      http.MethodPost,
 		Path:        "/containers/server/:id/start",
-		Summary:     "Starts the container's associated game server",
+		Summary:     "Start server",
+		Description: "Starts the container's associated game server",
 	}, server.postStartServer)
 
 	huma.Register(humaApi, huma.Operation{ // Server status -> Online/Offline
 		OperationID: "post-detailsServer",
 		Method:      http.MethodPost,
 		Path:        "/containers/server/:id/details",
-		Summary:     "Check if the container's associated game server is running",
+		Summary:     "Check server status",
+		Description: "Check if the container's associated game server is running",
 	}, server.postDetailsServer)
 
 	huma.Register(humaApi, huma.Operation{ // Stop server
 		OperationID: "post-stopServer",
 		Method:      http.MethodPost,
 		Path:        "/containers/server/:id/stop",
-		Summary:     "Stops the container's associated game server",
+		Summary:     "Stop server",
+		Description: "Stops the container's associated game server",
 	}, server.postStopServer)
 
 	huma.Register(humaApi, huma.Operation{ // Restart server
 		OperationID: "post-restartServer",
 		Method:      http.MethodPost,
 		Path:        "/containers/server/:id/restart",
-		Summary:     "Restarts the container's associated game server",
+		Summary:     "Restart server",
+		Description: "Restarts the container's associated game server",
 	}, server.postRestartServer)
 
 	server.router = router
@@ -138,4 +146,41 @@ func NewErrorResponse(message string, errorCode string) ServerResponse { // Will
 	response.Body.ErrorCode = errorCode
 
 	return response
+}
+
+// Sets up required info for OpenAPI documentation
+func openApiSpecs(api huma.API) {
+	var contact = huma.Contact{
+		Name:  "Bruno Biz Dias de Castro",
+		Email: "brunobizdc@gmail.com",
+		URL:   "https://github.com/BrunoBiz",
+	}
+
+	var info = huma.Info{
+		Title:       "Proxmox Orchestration API",
+		Description: "A RESTful API that provides access to Proxmox environment information and enables administrators to manage the lifecycle of game servers running inside Proxmox LXC containers.",
+		Contact:     &contact,
+		Version:     "1.0.0",
+	}
+	api.OpenAPI().Info = &info
+
+	var servers = huma.Server{
+		URL:         "http://192.168.18.162:8090",
+		Description: "Local Proxmox container IP",
+	}
+	api.OpenAPI().Servers = append(api.OpenAPI().Servers, &servers)
+
+	var tagContainer = huma.Tag{
+		Name:        "Containers",
+		Description: "Operations for retrieving and managing Proxmox LXC containers.",
+	}
+
+	var tagServices = huma.Tag{
+		Name:        "Services",
+		Description: "Operations for managing game server services running within Proxmox LXC containers.",
+	}
+
+	api.OpenAPI().Tags = append(api.OpenAPI().Tags, &tagContainer)
+	api.OpenAPI().Tags = append(api.OpenAPI().Tags, &tagServices)
+
 }
