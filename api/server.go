@@ -59,6 +59,9 @@ func (server *Server) setupRouter() {
 	humaApi := humagin.New(router, huma.DefaultConfig("Proxmox Orchestration API", "1.0.0"))
 	openApiSpecs(humaApi)
 
+	var tagContainers = []string{"Containers"}
+	var tagServices = []string{"Services"}
+
 	// Sets up routing
 	// Uses the Proxmox API
 	huma.Register(humaApi, huma.Operation{ // Returns info about all containers
@@ -67,55 +70,62 @@ func (server *Server) setupRouter() {
 		Path:        "/containers",
 		Summary:     "Retrieve all containers",
 		Description: "Lists all available containers and information about each of them, such as id, name, uptime, status, etc.",
+		Tags:        tagContainers,
 	}, server.getContainers)
 
 	huma.Register(humaApi, huma.Operation{ // Returns info about a specific container
 		OperationID: "get-containersById",
 		Method:      http.MethodGet,
-		Path:        "/containers/:id",
+		Path:        "/containers/{id}",
 		Summary:     "Retrieve container via id",
 		Description: "Returns information about a specific container, if found, via it's vmid.",
+		Tags:        tagContainers,
 	}, server.getContainerById)
 
 	huma.Register(humaApi, huma.Operation{ // Returns if a specific container is running
 		OperationID: "get-containerStatusById",
 		Method:      http.MethodGet,
-		Path:        "/containers/:id/status",
+		Path:        "/containers/{id}/status",
 		Summary:     "Check if container is running",
 		Description: "Retrieves the current running state of the specified Proxmox LXC container.",
+		Tags:        tagContainers,
 	}, server.getContainerStatusById)
 
 	// Uses SSH to connect to a container and run the commands
 	huma.Register(humaApi, huma.Operation{ // Start server
 		OperationID: "post-startServer",
 		Method:      http.MethodPost,
-		Path:        "/containers/server/:id/start",
+		Path:        "/containers/server/{id}/start",
 		Summary:     "Start server",
 		Description: "Starts the container's associated game server",
+		Tags:        tagServices,
 	}, server.postStartServer)
 
 	huma.Register(humaApi, huma.Operation{ // Server status -> Online/Offline
 		OperationID: "post-detailsServer",
 		Method:      http.MethodPost,
-		Path:        "/containers/server/:id/details",
+		Path:        "/containers/server/{id}/details",
 		Summary:     "Check server status",
 		Description: "Check if the container's associated game server is running",
+		Tags:        tagServices,
 	}, server.postDetailsServer)
 
 	huma.Register(humaApi, huma.Operation{ // Stop server
 		OperationID: "post-stopServer",
 		Method:      http.MethodPost,
-		Path:        "/containers/server/:id/stop",
+		Path:        "/containers/server/{id}/stop",
 		Summary:     "Stop server",
 		Description: "Stops the container's associated game server",
+		Tags:        tagServices,
 	}, server.postStopServer)
 
 	huma.Register(humaApi, huma.Operation{ // Restart server
 		OperationID: "post-restartServer",
 		Method:      http.MethodPost,
-		Path:        "/containers/server/:id/restart",
+		Path:        "/containers/server/{id}/restart",
 		Summary:     "Restart server",
 		Description: "Restarts the container's associated game server",
+		Tags:        tagServices,
 	}, server.postRestartServer)
 
 	server.router = router
