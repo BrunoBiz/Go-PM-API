@@ -45,7 +45,7 @@ func NewClient(config util.Config, ctx context.Context) (*ProxmoxClient, error) 
 	return proxmoxClient, nil
 }
 
-// Testing
+// Testing -- ignore
 func (pmClient *ProxmoxClient) PingCtn() {
 	ctnList, _ := pmClient.Node.Containers(pmClient.ctx)
 	var totalMem uint64

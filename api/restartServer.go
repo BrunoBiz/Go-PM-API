@@ -22,7 +22,7 @@ func (server *Server) postRestartServer(c context.Context, input *ServerRequest)
 	slog.Log(c, logger.LevelFile, "[postStartServer] - User: "+input.Body.User)
 
 	// Prepares the command to restart the server
-	commandRestart := fmt.Sprintf(`pct exec %d -- bash -c "su -s /bin/bash %s -c 'cd ~ && ./gameserver restart'"`,
+	commandRestart := fmt.Sprintf(`pct exec %d -- bash -c "su -s /bin/bash %s -c 'cd ~ && ./Narwhal restart'"`,
 		cntID,
 		input.Body.User)
 	slog.Log(c, logger.LevelFile, "[postRestartServer] - commandDetails: "+commandRestart)

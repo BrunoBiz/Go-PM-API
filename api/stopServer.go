@@ -22,7 +22,7 @@ func (server *Server) postStopServer(c context.Context, input *ServerRequest) (*
 	slog.Log(c, logger.LevelFile, "[postStartServer] - User: "+input.Body.User)
 
 	// Prepares the command to start the server
-	commandStop := fmt.Sprintf(`pct exec %d -- bash -c "su -s /bin/bash %s -c 'cd ~ && ./gameserver stop'"`,
+	commandStop := fmt.Sprintf(`pct exec %d -- bash -c "su -s /bin/bash %s -c 'cd ~ && ./Narwhal stop'"`,
 		cntID,
 		input.Body.User)
 

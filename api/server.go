@@ -56,7 +56,7 @@ func (server *Server) setupRouter() {
 	router.Use(sloggin.NewWithConfig(defaultLogger, configSlogGin))
 
 	// Sets up HUMA
-	humaApi := humagin.New(router, huma.DefaultConfig("Proxmox Orchestration API", "1.0.0"))
+	humaApi := humagin.New(router, huma.DefaultConfig("Orcha - Proxmox Orchestration API", "1.0.0"))
 	openApiSpecs(humaApi)
 
 	var tagContainers = []string{"Containers"}
@@ -167,7 +167,7 @@ func openApiSpecs(api huma.API) {
 	}
 
 	var info = huma.Info{
-		Title:       "Proxmox Orchestration API",
+		Title:       "Orcha - Proxmox Orchestration API",
 		Description: "A RESTful API that provides access to Proxmox environment information and enables administrators to manage the lifecycle of game servers running inside Proxmox LXC containers.",
 		Contact:     &contact,
 		Version:     "1.0.0",

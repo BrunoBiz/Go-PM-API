@@ -31,7 +31,7 @@ const (
 
 func LoadLogger() error {
 
-	//The 'Log' folder will always be in the root directory of GameServerManager
+	//The 'Log' folder will always be in the root directory of Orcha
 	err := checkDirectory()
 	if err != nil {
 		return err
@@ -45,7 +45,7 @@ func LoadLogger() error {
 
 	// Every log file will be named accordingly to the current date
 	fileName := time.Now().Format(time.DateOnly)
-	logFile, err := os.OpenFile(fmt.Sprintf("Log/%s-gsm.log", fileName), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
+	logFile, err := os.OpenFile(fmt.Sprintf("Log/%s-orcha.log", fileName), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 
 	if err != nil {
 		slog.Error("Can't create log file - " + err.Error())

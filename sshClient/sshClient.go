@@ -43,7 +43,6 @@ func NewSshClient(config util.Config) (*SshClient, error) {
 		config:    config,
 	}
 
-	// defer client.Close() 	// TODO - Close connection somewhere
 	return sshClient, nil
 }
 

@@ -2,9 +2,9 @@
 $env:GOOS = "linux"
 $env:GOARCH = "amd64"
 
-$deployIP = "192.168.18.162"  # GoPM-API Container
+$deployIP = "192.168.18.162"  # Orcha Container
 
-go build -o ProxmoxMgr_API
+go build -o Orcha
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Build failed."
@@ -12,7 +12,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # Deploy to server - app
-scp .\ProxmoxMgr_API root@[$deployIP]:/home/api/ProxmoxMgr_API
+scp .\Orcha root@[$deployIP]:/home/api/Orcha
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Copy failed - .\ProxmoxMgr_API"
@@ -28,7 +28,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # CHMOD API
-ssh "api@$deployIP" "sudo chmod +x ProxmoxMgr_API;"
+ssh "api@$deployIP" "sudo chmod +x Orcha;"
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "SSH Failed - CHMOD."

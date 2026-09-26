@@ -22,7 +22,7 @@ func (server *Server) postStartServer(c context.Context, input *ServerRequest) (
 	slog.Log(c, logger.LevelFile, "[postStartServer] - User: "+input.Body.User)
 
 	// Prepares the command to start the server
-	commandStart := fmt.Sprintf(`pct exec %d -- bash -c "su -s /bin/bash %s -c 'cd ~ && ./gameserver start'"`,
+	commandStart := fmt.Sprintf(`pct exec %d -- bash -c "su -s /bin/bash %s -c 'cd ~ && ./Narwhal start'"`,
 		cntID,
 		input.Body.User)
 	slog.Log(c, logger.LevelFile, "[postStartServer] - commandDetails: "+commandStart)

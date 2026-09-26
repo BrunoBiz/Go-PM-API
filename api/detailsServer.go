@@ -24,7 +24,7 @@ func (server *Server) postDetailsServer(c context.Context, input *ServerRequest)
 	slog.Log(c, logger.LevelFile, "[postStartServer] - User: "+input.Body.User)
 
 	// Prepares the command to check server details
-	commandDetails := fmt.Sprintf(`pct exec %d -- bash -c "su -s /bin/bash %s -c 'cd ~ && ./gameserver details'"`,
+	commandDetails := fmt.Sprintf(`pct exec %d -- bash -c "su -s /bin/bash %s -c 'cd ~ && ./Narwhal details'"`,
 		cntID,
 		input.Body.User)
 	slog.Log(c, logger.LevelFile, "[postDetailsServer] - commandDetails: "+commandDetails)

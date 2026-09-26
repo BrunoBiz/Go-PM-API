@@ -6,7 +6,7 @@
 
 
 # Intro
-This document presents the outcomes of LinuxGSM and GSM, in response to each of the main options provided by the API, in a way to compare both and find common semantic meaning between them.
+This document presents the outcomes of LinuxGSM and Narwhal, in response to each of the main options provided by the API, in a way to compare both and find common semantic meaning between them.
 
 The purpose of these tests if to streamline how the response in the API will be handled, while still being agnostic to which one of the managers is currently hosting the server.
 
@@ -14,7 +14,7 @@ The data collected here will represent if a manager is idempotent, if a request 
 
 Below is a list of all the tests that will be performed to collect the data for this document:
 
-| **Initial state** | **Operation** | **LinuxGSM**  | **GSM**       |
+| **Initial state** | **Operation** | **LinuxGSM**  | **Narwhal**   |
 |-------------------|---------------|---------------|---------------|
 | on                | start         | actual output | actual output |
 | off               | start         | actual output | actual output |
@@ -65,7 +65,7 @@ Using LinuxGSM - Wrapper
 [ SKIP ] Starting untserver: LinuxGSM is already running
 ```
 
-### GSM <!-- omit from toc -->
+### Narwhal <!-- omit from toc -->
 
 Initial Status: Off
 
@@ -75,9 +75,9 @@ Initial Status: Off
 - Exit code: 0
 - Stdout / Stderr:
 
-""="GSM - START - SUCCESS: true"
-""="GSM - START - COMMAND: /bin/tmux new -d -s mockServerTest '/opt/mockServerTest'"
-""="GSM - START - MESSAGE: Server started"
+""="Narwhal - START - SUCCESS: true"
+""="Narwhal - START - COMMAND: /bin/tmux new -d -s mockServerTest '/opt/mockServerTest'"
+""="Narwhal - START - MESSAGE: Server started"
 ```
 
 Initial Status: On
@@ -88,11 +88,11 @@ Initial Status: On
 - Exit code: 0
 - Stdout / Stderr:
 
-""="GSM - START - SUCCESS: false"
-""="GSM - START - ERROR: exit status 1"
-""="GSM - START - COMMAND: /bin/tmux new -d -s mockServerTest '/opt/mockServerTest'"
-""="GSM - START - COMMAND RESULT: duplicate session: mockServerTest\n"
-""="GSM - START - MESSAGE: Server is already running"
+""="Narwhal - START - SUCCESS: false"
+""="Narwhal - START - ERROR: exit status 1"
+""="Narwhal - START - COMMAND: /bin/tmux new -d -s mockServerTest '/opt/mockServerTest'"
+""="Narwhal - START - COMMAND RESULT: duplicate session: mockServerTest\n"
+""="Narwhal - START - MESSAGE: Server is already running"
 ```
 
 Error
@@ -100,10 +100,10 @@ Error
 ```
 - Stdout / Stderr:
 
-"GSM - START - SUCCESS: false"
-"GSM - START - ERROR: chdir /opt/minecraft/MBC-Server/: no such file or directory"
-"GSM - START - COMMAND: /bin/tmux new -d -s minecraft '/opt/minecraft/MBC-Server/ServerStart.sh'"
-"GSM - START - MESSAGE: Unable to start"
+"Narwhal - START - SUCCESS: false"
+"Narwhal - START - ERROR: chdir /opt/minecraft/MBC-Server/: no such file or directory"
+"Narwhal - START - COMMAND: /bin/tmux new -d -s minecraft '/opt/minecraft/MBC-Server/ServerStart.sh'"
+"Narwhal - START - MESSAGE: Unable to start"
 ```
 
 ## Stop
@@ -138,7 +138,7 @@ Using LinuxGSM - Wrapper
 [  OK  ] Stopping untserver: Graceful: CTRL+c: 4 ... OK
 ```
 
-### GSM <!-- omit from toc -->
+### Narwhal <!-- omit from toc -->
 
 Initial Status: Off
 
@@ -149,11 +149,11 @@ Initial Status: Off
 - Stdout / Stderr:
 
 ""="Stopping server..."
-""="GSM - STOP - SUCCESS: false"
-""="GSM - STOP - ERROR: exit status 1"
-""="GSM - STOP - COMMAND: /bin/tmux send-keys -t mockServerTest shutdown ENTER"
-""="GSM - STOP - COMMAND RESULT: no server running on /tmp/tmux-1000/default\n"
-""="GSM - STOP - MESSAGE: Server is already stopped"
+""="Narwhal - STOP - SUCCESS: false"
+""="Narwhal - STOP - ERROR: exit status 1"
+""="Narwhal - STOP - COMMAND: /bin/tmux send-keys -t mockServerTest shutdown ENTER"
+""="Narwhal - STOP - COMMAND RESULT: no server running on /tmp/tmux-1000/default\n"
+""="Narwhal - STOP - MESSAGE: Server is already stopped"
 ```
 
 Initial Status: On
@@ -167,9 +167,9 @@ Initial Status: On
 ""="Stopping server..."
 Time elapsed: 15s / 300s
 
-""="GSM - STOP - SUCCESS: true"
-""="GSM - STOP - COMMAND: /bin/tmux send-keys -t mockServerTest shutdown ENTER"
-""="GSM - STOP - MESSAGE: Server stopped"
+""="Narwhal - STOP - SUCCESS: true"
+""="Narwhal - STOP - COMMAND: /bin/tmux send-keys -t mockServerTest shutdown ENTER"
+""="Narwhal - STOP - MESSAGE: Server stopped"
 ```
 
 ## Restart
@@ -218,7 +218,7 @@ grep: /etc/apt/sources.list: No such file or directory
 [  OK  ] Starting untserver: LinuxGSM
 ```
 
-### GSM <!-- omit from toc -->
+### Narwhal <!-- omit from toc -->
 
 Initial Status: Off
 
@@ -228,14 +228,14 @@ Initial Status: Off
 - Exit code: 0
 - Stdout / Stderr:
 
-""="GSM - DETAILS - SUCCESS: true"
-""="GSM - DETAILS - SERVER STATUS: STOPPED"
-""="GSM - DETAILS - COMMAND: /bin/tmux ls"
-""="GSM - DETAILS - COMMAND RESULT: no server running on /tmp/tmux-1000/default\n"
-""="GSM - DETAILS - MESSAGE: No server running"
-""="GSM - START - SUCCESS: true"
-""="GSM - START - COMMAND: /bin/tmux new -d -s mockServerTest '/opt/mockServerTest'"
-""="GSM - START - MESSAGE: Server started"
+""="Narwhal - DETAILS - SUCCESS: true"
+""="Narwhal - DETAILS - SERVER STATUS: STOPPED"
+""="Narwhal - DETAILS - COMMAND: /bin/tmux ls"
+""="Narwhal - DETAILS - COMMAND RESULT: no server running on /tmp/tmux-1000/default\n"
+""="Narwhal - DETAILS - MESSAGE: No server running"
+""="Narwhal - START - SUCCESS: true"
+""="Narwhal - START - COMMAND: /bin/tmux new -d -s mockServerTest '/opt/mockServerTest'"
+""="Narwhal - START - MESSAGE: Server started"
 ```
 
 Initial Status: On
@@ -246,20 +246,20 @@ Initial Status: On
 - Exit code: 0
 - Stdout / Stderr:
 
-""="GSM - DETAILS - SUCCESS: true"
-""="GSM - DETAILS - SERVER STATUS: STARTED"
-""="GSM - DETAILS - COMMAND: /bin/tmux ls"
-""="GSM - DETAILS - COMMAND RESULT: mockServerTest: 1 windows (created Thu Sep  3 01:08:27 2026)\n"
-""="GSM - DETAILS - MESSAGE: Server running"
+""="Narwhal - DETAILS - SUCCESS: true"
+""="Narwhal - DETAILS - SERVER STATUS: STARTED"
+""="Narwhal - DETAILS - COMMAND: /bin/tmux ls"
+""="Narwhal - DETAILS - COMMAND RESULT: mockServerTest: 1 windows (created Thu Sep  3 01:08:27 2026)\n"
+""="Narwhal - DETAILS - MESSAGE: Server running"
 ""="Stopping server..."
 Time elapsed: 15s / 300s
 
-""="GSM - STOP - SUCCESS: true"
-""="GSM - STOP - COMMAND: /bin/tmux send-keys -t mockServerTest shutdown ENTER"
-""="GSM - STOP - MESSAGE: Server stopped"
-""="GSM - START - SUCCESS: true"
-""="GSM - START - COMMAND: /bin/tmux new -d -s mockServerTest '/opt/mockServerTest'"
-""="GSM - START - MESSAGE: Server started"
+""="Narwhal - STOP - SUCCESS: true"
+""="Narwhal - STOP - COMMAND: /bin/tmux send-keys -t mockServerTest shutdown ENTER"
+""="Narwhal - STOP - MESSAGE: Server stopped"
+""="Narwhal - START - SUCCESS: true"
+""="Narwhal - START - COMMAND: /bin/tmux new -d -s mockServerTest '/opt/mockServerTest'"
+""="Narwhal - START - MESSAGE: Server started"
 ```
 
 ## Details
@@ -470,7 +470,7 @@ Steam        27016  udp       1
 Status: STARTED
 ```
 
-### GSM <!-- omit from toc -->
+### Narwhal <!-- omit from toc -->
 
 Initial Status: Off
 
@@ -480,11 +480,11 @@ Initial Status: Off
 - Exit code: 0
 - Stdout / Stderr:
 
-""="GSM - DETAILS - SUCCESS: true"
-""="GSM - DETAILS - SERVER STATUS: STOPPED"
-""="GSM - DETAILS - COMMAND: /bin/tmux ls"
-""="GSM - DETAILS - COMMAND RESULT: no server running on /tmp/tmux-1000/default\n"
-""="GSM - DETAILS - MESSAGE: No server running"
+""="Narwhal - DETAILS - SUCCESS: true"
+""="Narwhal - DETAILS - SERVER STATUS: STOPPED"
+""="Narwhal - DETAILS - COMMAND: /bin/tmux ls"
+""="Narwhal - DETAILS - COMMAND RESULT: no server running on /tmp/tmux-1000/default\n"
+""="Narwhal - DETAILS - MESSAGE: No server running"
 ```
 
 Initial Status: On
@@ -495,9 +495,9 @@ Initial Status: On
 - Exit code: 0 
 - Stdout / Stderr:
 
-""="GSM - DETAILS - SUCCESS: true"
-""="GSM - DETAILS - SERVER STATUS: STARTED"
-""="GSM - DETAILS - COMMAND: /bin/tmux ls"
-""="GSM - DETAILS - COMMAND RESULT: mockServerTest: 1 windows (created Thu Sep  3 01:09:03 2026)\n"
-""="GSM - DETAILS - MESSAGE: Server running"
+""="Narwhal - DETAILS - SUCCESS: true"
+""="Narwhal - DETAILS - SERVER STATUS: STARTED"
+""="Narwhal - DETAILS - COMMAND: /bin/tmux ls"
+""="Narwhal - DETAILS - COMMAND RESULT: mockServerTest: 1 windows (created Thu Sep  3 01:09:03 2026)\n"
+""="Narwhal - DETAILS - MESSAGE: Server running"
 ```
